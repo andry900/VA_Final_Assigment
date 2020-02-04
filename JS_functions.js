@@ -1,5 +1,5 @@
 function Test() {
-    let svg=d3.select("svg")
+    /*var svg=d3.select("svg");
     svg.selectAll("circle")
         .data([10, 50, 100])
         .enter()
@@ -9,5 +9,6 @@ function Test() {
         .attr("cy", function (d) {return d;})
         .attr("r", function(d) {
             return d;
-        })
+        });
+     */
 }
