@@ -1,52 +1,48 @@
-body{
-	background:#C9D6CF;
-}
-
-.svg_area{
-	background:white;
-}
-
-.red{
-	fill:red;
-}
-
-.green{
-	fill:green;
-}
-
-.blue{
-	fill:blue;
-}
-
-.top, .bottom {
+.topDiv, .bottomDiv {
 	position: fixed;
 	left: 0;
 	right: 0;
 	height: 50%;
-	border-style: solid;
-	background-color: white;
 }
 
-.top {
+.topDiv {
 	top: 0;
+	border-bottom-style: solid;
 }
 
-.bottom {
+.bottomDiv {
 	bottom: 0;
 }
-.left,.right{
+
+.bottomLeftDiv, .bottomRightDiv {
 	position: fixed;
-	top:50%;
-	bottom:0;
+	top: 50%;
+	bottom: 0;
 	height: 50%;
 	width: 50%;
-	border-style: solid;
-	background-color: white;
-}
-.left {
-	left: 0;
 }
 
-.right {
+.bottomLeftDiv {
+	left: 0;
+	border-right-style: solid;
+}
+
+.bottomRightDiv {
 	right: 0;
+}
+
+.sphere {
+	fill: #fff;
+}
+
+.land {
+	fill: #000;
+}
+
+.boundary {
+	fill: none;
+	stroke: #fff;
+	stroke-linejoin: round;
+	stroke-linecap: round;
+	vector-effect: non-scaling-stroke;
 }
