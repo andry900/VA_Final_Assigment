@@ -226,3 +226,12 @@ function Load_Map() {
         }
     );
 }
+
+function Load_CSV() {
+     var data = d3.csv("/Dataset/Ncov_Inside_Hubei.csv", function(data) {
+        for (var i = 0; i < data.length; i++) {
+            console.log(data[i].age);
+            console.log(data[i].sex);
+        }
+    });
+}
