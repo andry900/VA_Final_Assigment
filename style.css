@@ -31,18 +31,23 @@
 	right: 0;
 }
 
-.sphere {
-	fill: #fff;
+svg rect {
+	fill: #2A2C39;   /* map background colour */
 }
-
-.land {
-	fill: #000;
+.country{
+	fill: #d0d0d0;   /* country colour */
+	stroke: #2A2C39; /* country border colour */
+	stroke-width: 1; /* country border width */
 }
-
-.boundary {
-	fill: none;
-	stroke: #fff;
-	stroke-linejoin: round;
-	stroke-linecap: round;
-	vector-effect: non-scaling-stroke;
+.country-on{
+	fill: #4B5358;   /* highlight colour for selected country */
+}
+.countryLabel{
+	display: none;   /* hide all country labels by default */
+}
+.countryName{
+	fill: #FFFAFF;   /* country label text colour */
+}
+.countryLabelBg{
+	fill: #30BCED;   /* country label background colour */
 }
