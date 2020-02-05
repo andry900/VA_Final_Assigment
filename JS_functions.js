@@ -25,21 +25,21 @@ function Load_Map() {
 
     d3.json('//unpkg.com/world-atlas@1/world/110m.json')
         .then(world => {
-            g.append('path')
-                .datum({ type: 'Sphere' })
-                .attr('class', 'sphere')
-                .attr('d', path);
+        g.append('path')
+            .datum({ type: 'Sphere' })
+            .attr('class', 'sphere')
+            .attr('d', path);
 
-            g.append('path')
-                .datum(topojson.merge(world, world.objects.countries.geometries))
-                .attr('class', 'land')
-                .attr('d', path);
+    g.append('path')
+        .datum(topojson.merge(world, world.objects.countries.geometries))
+        .attr('class', 'land')
+        .attr('d', path);
 
-            g.append('path')
-                .datum(topojson.mesh(world, world.objects.countries, (a, b) => a !== b))
-                .attr('class', 'boundary')
-                .attr('d', path);
-        });
+    g.append('path')
+        .datum(topojson.mesh(world, world.objects.countries, (a, b) => a !== b))
+.attr('class', 'boundary')
+        .attr('d', path);
+});
 
     function zoomed() {
         g.selectAll('path') // To prevent stroke width from scaling
