@@ -34,3 +34,19 @@ body{
 .bottom {
 	bottom: 0;
 }
+.left,.right{
+	position: fixed;
+	top:50%;
+	bottom:0;
+	height: 50%;
+	width: 50%;
+	border-style: solid;
+	background-color: white;
+}
+.left {
+	left: 0;
+}
+
+.right {
+	right: 0;
+}
