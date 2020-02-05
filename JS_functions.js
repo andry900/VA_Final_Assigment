@@ -228,10 +228,43 @@ function Load_Map() {
 }
 
 function Load_CSV() {
-     var data = d3.csv("/Dataset/Ncov_Inside_Hubei.csv", function(data) {
-        for (var i = 0; i < data.length; i++) {
-            console.log(data[i].age);
-            console.log(data[i].sex);
+    d3.csv("Dataset/Ncov_Inside_Hubei.csv", function(data) {
+        let newData = new Array(data.length);
+
+        for (let i = 0; i < data.length; i++) {
+            let arrAges, avgAge;
+            let number_diseases = 0, arrDiseases;
+
+            if (data[i].age == ("")) {
+                data[i].age = Math.floor(Math.random() * 101);
+            }
+            else if (data[i].age.includes("-")) {
+                arrAges = data[i].age.split("-");
+                avgAge = (parseInt(arrAges[0]) + parseInt(arrAges[1]))/2;
+                data[i].age = avgAge;
+            }
+            else {
+                data[i].age = parseInt(data[i].age);
+            }
+
+            if (data[i].sex == "") {
+                data[i].sex = Math.floor(Math.random() * 2); //0 is female, 1 is male
+            } else {
+                if (data[i].sex == "female") {
+                    data[i].sex = 0;
+                }
+                else {
+                    data[i].sex = 1;
+                }
+            }
+
+            if (data[i].chronic_diseases != "") {
+                arrDiseases = data[i].chronic_diseases.split(",")
+                number_diseases = arrDiseases.length;
+            }
+
+            newData[i] = [data[i].age, data[i].sex, number_diseases];
         }
+        console.log(newData);
     });
 }
