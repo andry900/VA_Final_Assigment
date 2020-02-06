@@ -241,7 +241,7 @@ function Load_CSV() {
             else if (data[i].age.includes("-")) {
                 arrAges = data[i].age.split("-");
                 avgAge = (parseInt(arrAges[0]) + parseInt(arrAges[1]))/2;
-                data[i].age = avgAge;
+                data[i].age = Math.round(avgAge);
             }
             else {
                 data[i].age = parseInt(data[i].age);
@@ -259,12 +259,67 @@ function Load_CSV() {
             }
 
             if (data[i].chronic_diseases != "") {
-                arrDiseases = data[i].chronic_diseases.split(",")
+                arrDiseases = data[i].chronic_diseases.split(",");
                 number_diseases = arrDiseases.length;
             }
 
             newData[i] = [data[i].age, data[i].sex, number_diseases];
         }
         console.log(newData);
+
     });
 }
+
+function Draw_Circles(csv_data,projection){
+    for (let i=0;i<csv_data.length;i++){
+
+        let latitude = csv_data[i].latitude;
+        let longitude = csv_data[i].longitude;
+        let cordinates = projection(longitude,latitude);
+        //var greatArc = d3.geo.greatArc();
+        //var distance = greatArc.distance({source: a: target: b}) * 6371;
+
+        //create an svg on the map
+        let svg = d3.select("#map-holder").append("svg")
+            // set to the same size as the "map-holder" div
+            .attr("width", $("#map-holder").width())
+            .attr("height", $("#map-holder").height())
+
+        if (array_number_diseases[i] <= 10){
+            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
+                .attr("class","green")
+                .attr("cx",cordinates[0])
+                .attr("cy",cordinates[1])
+                .attr("r",array_number_diseases[i]);
+        }
+        if (array_number_diseases[i] > 10 && array_number_diseases[i]<= 30 ){
+            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
+                .attr("class","yellow")
+                .attr("cx",cordinates[0])
+                .attr("cy",cordinates[1])
+                .attr("r",array_number_diseases[i]);
+        }
+        if (array_number_diseases[i] > 30 && array_number_diseases[i]<= 50 ){
+            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
+                .attr("class","orange")
+                .attr("cx",cordinates[0])
+                .attr("cy",cordinates[1])
+                .attr("r",array_number_diseases[i]);
+        }
+        else{
+            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
+                .attr("class","red")
+                .attr("cx",cordinates[0])
+                .attr("cy",cordinates[1])
+                .attr("r",array_number_diseases[i]);
+        }
+
+    }
+
+}
+
+// è il numero di casi trovati uguale a 10,20 ecc.. non di disease
+//creare le classi css: greeen, yellow, orange, red?
+// come prendere certi dati dalle altre funzioni
+
+
