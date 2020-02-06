@@ -225,9 +225,11 @@ function Load_Map() {
             initiateZoom();
         }
     );
+
+    Draw_Circles(svg, projection);
 }
 
-function Load_CSV() {
+/*function Load_CSV() {
     d3.csv("Dataset/Ncov_Inside_Hubei.csv", function(data) {
         let newData = new Array(data.length);
 
@@ -266,60 +268,72 @@ function Load_CSV() {
             newData[i] = [data[i].age, data[i].sex, number_diseases];
         }
         console.log(newData);
+    });
+}*/
 
+function Draw_Circles(svg, projection) {
+    d3.csv("Dataset/Ncov_Inside_Hubei.csv", function(csv_data) {
+        let circle = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
+        let arrCircles = [];
+        let arr = new Array(csv_data.length).fill(Array(4));
+
+        for (let i = 0; i < csv_data.length; i++) {
+            if (arr[csv_data[i].ID - 1][0] == undefined) {
+                totInfected = 1;
+                sumLatitudes = parseFloat(csv_data[i].latitude);
+                sumLongitudes = parseFloat(csv_data[i].longitude);
+                circle++;
+                arr[csv_data[i].ID - 1] = [csv_data[i].ID, circle, csv_data[i].latitude, csv_data[i].longitude];
+                for (let j = 1; j < csv_data.length; j++) {
+                    if (arr[csv_data[j].ID - 1][0] == undefined) {
+                        if ((csv_data[i].latitude - csv_data[j].latitude) < 0.5 && (csv_data[i].longitude - csv_data[j].longitude) < 0.5) {
+                            arr[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
+                            totInfected++;
+                            sumLatitudes += parseFloat(csv_data[i].latitude);
+                            sumLongitudes += parseFloat(csv_data[i].longitude);
+                        }
+                    }
+                }
+                arrCircles[circle - 1] = [circle, totInfected, sumLatitudes/totInfected, sumLongitudes/totInfected];
+                let cordinates = projection(arrCircles[circle - 1][3].toString(), arrCircles[circle - 1][2].toString());
+
+                if (totInfected < 10) {
+                    svg.append("circle")
+                        .attr("fill", "white")
+                        .attr("cx", cordinates[0])
+                        .attr("cy", cordinates[1])
+                        .attr("r", 4);
+                }
+                else if (totInfected >= 10 && totInfected < 100) {
+                    svg.append("circle")
+                        .attr("fill", "green")
+                        .attr("cx", cordinates[0])
+                        .attr("cy", cordinates[1])
+                        .attr("r", 6);
+                }
+                else if (totInfected >= 100 && totInfected < 500) {
+                    svg.append("circle")
+                        .attr("fill", "yellow")
+                        .attr("cx", cordinates[0])
+                        .attr("cy", cordinates[1])
+                        .attr("r", 8);
+                }
+                else if (totInfected >= 500 && totInfected < 1000) {
+                    svg.append("circle")
+                        .attr("fill", "orange")
+                        .attr("cx", cordinates[0])
+                        .attr("cy", cordinates[1])
+                        .attr("r", 10);
+                } else {
+                    svg.append("circle")
+                        .attr("fill", "red")
+                        .attr("cx", cordinates[0])
+                        .attr("cy", cordinates[1])
+                        .attr("r", 12);
+                }
+            }
+        }
+        console.log(arr);
+        console.log(arrCircles);
     });
 }
-
-function Draw_Circles(csv_data,projection){
-    for (let i=0;i<csv_data.length;i++){
-
-        let latitude = csv_data[i].latitude;
-        let longitude = csv_data[i].longitude;
-        let cordinates = projection(longitude,latitude);
-        //var greatArc = d3.geo.greatArc();
-        //var distance = greatArc.distance({source: a: target: b}) * 6371;
-
-        //create an svg on the map
-        let svg = d3.select("#map-holder").append("svg")
-            // set to the same size as the "map-holder" div
-            .attr("width", $("#map-holder").width())
-            .attr("height", $("#map-holder").height())
-
-        if (array_number_diseases[i] <= 10){
-            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
-                .attr("class","green")
-                .attr("cx",cordinates[0])
-                .attr("cy",cordinates[1])
-                .attr("r",array_number_diseases[i]);
-        }
-        if (array_number_diseases[i] > 10 && array_number_diseases[i]<= 30 ){
-            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
-                .attr("class","yellow")
-                .attr("cx",cordinates[0])
-                .attr("cy",cordinates[1])
-                .attr("r",array_number_diseases[i]);
-        }
-        if (array_number_diseases[i] > 30 && array_number_diseases[i]<= 50 ){
-            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
-                .attr("class","orange")
-                .attr("cx",cordinates[0])
-                .attr("cy",cordinates[1])
-                .attr("r",array_number_diseases[i]);
-        }
-        else{
-            svg.selectAll("cirlce").data(array_number_diseases).enter().append("circle")
-                .attr("class","red")
-                .attr("cx",cordinates[0])
-                .attr("cy",cordinates[1])
-                .attr("r",array_number_diseases[i]);
-        }
-
-    }
-
-}
-
-// è il numero di casi trovati uguale a 10,20 ecc.. non di disease
-//creare le classi css: greeen, yellow, orange, red?
-// come prendere certi dati dalle altre funzioni
-
-
