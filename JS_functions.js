@@ -227,8 +227,10 @@ function Load_Map() {
         }
     );
 
-    setTimeout(function(){ Draw_Circles(projection, "Dataset/Ncov_Inside_Hubei.csv"); }, 1000);
-    setTimeout(function(){ Draw_Circles(projection, "Dataset/Ncov_Outside_Hubei.csv"); }, 1000);
+    setTimeout(function(){
+        Draw_Circles(projection, "Dataset/Ncov_Inside_Hubei.csv");
+        Draw_Circles(projection, "Dataset/Ncov_Outside_Hubei.csv");
+    }, 1000);
 }
 
 /*function Load_CSV() {
@@ -285,16 +287,21 @@ function Draw_Circles(projection, pathDataset) {
         let arr = new Array(csv_data.length).fill(Array(4));
 
         for (let i = 0; i < csv_data.length; i++) {
-            if (arr[csv_data[i].ID - 1][0] == undefined) {
+            if (arr[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
+                !isNaN(parseInt(csv_data[i].latitude)) && !isNaN(parseInt(csv_data[i].longitude))) {
+
                 totInfected = 1;
                 sumLatitudes = parseFloat(csv_data[i].latitude);
                 sumLongitudes = parseFloat(csv_data[i].longitude);
                 circle++;
                 arr[csv_data[i].ID - 1] = [csv_data[i].ID, circle, csv_data[i].latitude, csv_data[i].longitude];
                 for (let j = 1; j < csv_data.length; j++) {
-                    if (arr[csv_data[j].ID - 1][0] == undefined) {
-                        //if ((csv_data[i].latitude - csv_data[j].latitude) <= 0 && (csv_data[i].longitude - csv_data[j].longitude) <= 0) {
-                        if (Math.sqrt(Math.pow(csv_data[i].latitude - csv_data[j].latitude, 2) - Math.pow(csv_data[i].longitude - csv_data[j].longitude, 2)) <= 0.5) {
+                    if (arr[csv_data[j].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
+                        !isNaN(parseInt(csv_data[i].latitude)) && !isNaN(parseInt(csv_data[i].longitude))) {
+
+                        if (Math.sqrt(Math.pow(csv_data[i].latitude - csv_data[j].latitude, 2) -
+                            Math.pow(csv_data[i].longitude - csv_data[j].longitude, 2)) <= 0.5) {
+
                             arr[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
                             totInfected++;
                             sumLatitudes += parseFloat(csv_data[j].latitude);
