@@ -3,15 +3,15 @@ function Load_Map() {
     // Define size of map group
     // Full world map is 2:1 ratio
     // Using 12:5 because we will crop top and bottom of map
-    w = 3000;
-    h = 1250;
+    let w = 3000;
+    let h = 1250;
     // variables for catching min and max zoom factors
-    var minZoom;
-    var maxZoom;
+    let minZoom;
+    let maxZoom;
 
     // DEFINE FUNCTIONS/OBJECTS
     // Define map projection
-    var projection = d3
+    let projection = d3
         .geoEquirectangular()
         .center([0, 15]) // set centre to further North as we are cropping more off bottom of map
         .scale([w / (2 * Math.PI)]) // scale to fit group width
@@ -19,7 +19,7 @@ function Load_Map() {
     ;
 
     // Define map path
-    var path = d3
+    let path = d3
         .geoPath()
         .projection(projection)
     ;
@@ -36,7 +36,7 @@ function Load_Map() {
     }
 
     // Define map zoom behaviour
-    var zoom = d3
+    let zoom = d3
         .zoom()
         .on("zoom", zoomed)
     ;
@@ -121,7 +121,7 @@ function Load_Map() {
     });
 
     // create an SVG
-    var svg = d3
+    let svg = d3
         .select("#map-holder")
         .append("svg")
         // set to the same size as the "map-holder" div
@@ -131,7 +131,7 @@ function Load_Map() {
         .call(zoom);
 
     // get map data
-    d3.json("https://raw.githubusercontent.com/andybarefoot/andybarefoot-www/master/maps/mapdata/custom50.json",
+    d3.json("Dataset/world.json",
         function(json) {
             //Bind data and create one path per GeoJSON feature
             countriesGroup = svg.append("g").attr("id", "map");
@@ -171,7 +171,7 @@ function Load_Map() {
                 });
             // Add a label group to each feature/country. This will contain the country name and a background rectangle
             // Use CSS to have class "countryLabel" initially hidden
-            countryLabels = countriesGroup
+            let countryLabels = countriesGroup
                 .selectAll("g")
                 .data(json.features)
                 .enter()
@@ -198,6 +198,7 @@ function Load_Map() {
                     d3.select("#country" + d.properties.iso_a3).classed("country-on", true);
                     boxZoom(path.bounds(d), path.centroid(d), 20);
                 });
+
             // add the text to the label group showing country name
             countryLabels
                 .append("text")
@@ -226,7 +227,8 @@ function Load_Map() {
         }
     );
 
-    Draw_Circles(svg, projection);
+    setTimeout(function(){ Draw_Circles(projection, "Dataset/Ncov_Inside_Hubei.csv"); }, 1000);
+    setTimeout(function(){ Draw_Circles(projection, "Dataset/Ncov_Outside_Hubei.csv"); }, 1000);
 }
 
 /*function Load_CSV() {
@@ -271,8 +273,13 @@ function Load_Map() {
     });
 }*/
 
-function Draw_Circles(svg, projection) {
-    d3.csv("Dataset/Ncov_Inside_Hubei.csv", function(csv_data) {
+function Draw_Circles(projection, pathDataset) {
+    let g = d3.select("svg")
+        .append("g")
+        .attr("id", "test")
+        .attr("transform", $("#map").attr("transform"));
+
+    d3.csv(pathDataset, function(csv_data) {
         let circle = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
         let arrCircles = [];
         let arr = new Array(csv_data.length).fill(Array(4));
@@ -286,46 +293,47 @@ function Draw_Circles(svg, projection) {
                 arr[csv_data[i].ID - 1] = [csv_data[i].ID, circle, csv_data[i].latitude, csv_data[i].longitude];
                 for (let j = 1; j < csv_data.length; j++) {
                     if (arr[csv_data[j].ID - 1][0] == undefined) {
-                        if ((csv_data[i].latitude - csv_data[j].latitude) < 0.5 && (csv_data[i].longitude - csv_data[j].longitude) < 0.5) {
+                        //if ((csv_data[i].latitude - csv_data[j].latitude) <= 0 && (csv_data[i].longitude - csv_data[j].longitude) <= 0) {
+                        if (Math.sqrt(Math.pow(csv_data[i].latitude - csv_data[j].latitude, 2) - Math.pow(csv_data[i].longitude - csv_data[j].longitude, 2)) <= 0.5) {
                             arr[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
                             totInfected++;
-                            sumLatitudes += parseFloat(csv_data[i].latitude);
-                            sumLongitudes += parseFloat(csv_data[i].longitude);
+                            sumLatitudes += parseFloat(csv_data[j].latitude);
+                            sumLongitudes += parseFloat(csv_data[j].longitude);
                         }
                     }
                 }
-                arrCircles[circle - 1] = [circle, totInfected, sumLatitudes/totInfected, sumLongitudes/totInfected];
+                arrCircles[circle - 1] = [circle, totInfected, sumLongitudes/totInfected, sumLatitudes/totInfected];
                 let coordinates = projection([sumLongitudes/totInfected, sumLatitudes/totInfected]);
 
                 if (totInfected < 10) {
-                    svg.append("circle")
+                    g.append("circle")
                         .attr("fill", "white")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
                         .attr("r", 4);
                 }
                 else if (totInfected >= 10 && totInfected < 100) {
-                    svg.append("circle")
+                    g.append("circle")
                         .attr("fill", "green")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
                         .attr("r", 6);
                 }
                 else if (totInfected >= 100 && totInfected < 500) {
-                    svg.append("circle")
+                    g.append("circle")
                         .attr("fill", "yellow")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
                         .attr("r", 8);
                 }
                 else if (totInfected >= 500 && totInfected < 1000) {
-                    svg.append("circle")
+                    g.append("circle")
                         .attr("fill", "orange")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
                         .attr("r", 10);
                 } else {
-                    svg.append("circle")
+                    g.append("circle")
                         .attr("fill", "red")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
