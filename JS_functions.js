@@ -30,7 +30,7 @@ function Load_Map() {
         ;
         countriesGroup.attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
 
-        if ($("#circles-area") != undefined) {
+        if ($("#circles-area").length > 0) {
             $("#circles-area").attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
         }
     }
@@ -228,14 +228,18 @@ function Load_Map() {
     );
 
     setTimeout(function(){
-        let g = d3.select("svg")
-            .append("g")
-            .attr("id", "circles-area")
-            .attr("transform", $("#map").attr("transform"));
-
-        Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
-        Draw_Circles(projection, g, "Dataset/Ncov_Outside_Hubei.csv");
+        Load_Data(projection);
     }, 1000);
+}
+
+function Load_Data(projection) {
+    let g = d3.select("svg")
+        .append("g")
+        .attr("id", "circles-area")
+        .attr("transform", $("#map").attr("transform"));
+
+    Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
+    Draw_Circles(projection, g, "Dataset/Ncov_Outside_Hubei.csv");
 }
 
 /*function Load_CSV() {
