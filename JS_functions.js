@@ -1,10 +1,8 @@
 function Load_Map() {
 // DEFINE VARIABLES
-    // Define size of map group
-    // Full world map is 2:1 ratio
-    // Using 12:5 because we will crop top and bottom of map
     let w = 3000;
     let h = 1250;
+
     // variables for catching min and max zoom factors
     let minZoom;
     let maxZoom;
@@ -26,13 +24,15 @@ function Load_Map() {
 
     // Create function to apply zoom to countriesGroup
     function zoomed() {
-        t = d3
+        let t = d3
             .event
             .transform
         ;
-        countriesGroup
-            .attr("transform","translate(" + [t.x, t.y] + ")scale(" + t.k + ")")
-        ;
+        countriesGroup.attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
+
+        if ($("#circles-area") != undefined) {
+            $("#circles-area").attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
+        }
     }
 
     // Define map zoom behaviour
@@ -63,40 +63,40 @@ function Load_Map() {
             .translateExtent([[0, 0], [w, h]])
         ;
         // define X and Y offset for centre of map to be shown in centre of holder
-        midX = ($("#map-holder").width() - minZoom * w) / 2;
-        midY = ($("#map-holder").height() - minZoom * h) / 2;
+        let midX = ($("#map-holder").width() - minZoom * w) / 2;
+        let midY = ($("#map-holder").height() - minZoom * h) / 2;
         // change zoom transform to min zoom and centre offsets
         svg.call(zoom.transform, d3.zoomIdentity.translate(midX, midY).scale(minZoom));
     }
 
     // zoom to show a bounding box, with optional additional padding as percentage of box size
     function boxZoom(box, centroid, paddingPerc) {
-        minXY = box[0];
-        maxXY = box[1];
+        let minXY = box[0];
+        let maxXY = box[1];
         // find size of map area defined
-        zoomWidth = Math.abs(minXY[0] - maxXY[0]);
-        zoomHeight = Math.abs(minXY[1] - maxXY[1]);
+        let zoomWidth = Math.abs(minXY[0] - maxXY[0]);
+        let zoomHeight = Math.abs(minXY[1] - maxXY[1]);
         // find midpoint of map area defined
-        zoomMidX = centroid[0];
-        zoomMidY = centroid[1];
+       let zoomMidX = centroid[0];
+       let zoomMidY = centroid[1];
         // increase map area to include padding
         zoomWidth = zoomWidth * (1 + paddingPerc / 100);
         zoomHeight = zoomHeight * (1 + paddingPerc / 100);
         // find scale required for area to fill svg
-        maxXscale = $("svg").width() / zoomWidth;
-        maxYscale = $("svg").height() / zoomHeight;
-        zoomScale = Math.min(maxXscale, maxYscale);
+        let maxXscale = $("svg").width() / zoomWidth;
+        let maxYscale = $("svg").height() / zoomHeight;
+        let zoomScale = Math.min(maxXscale, maxYscale);
         // handle some edge cases
         // limit to max zoom (handles tiny countries)
         zoomScale = Math.min(zoomScale, maxZoom);
         // limit to min zoom (handles large countries and countries that span the date line)
         zoomScale = Math.max(zoomScale, minZoom);
         // Find screen pixel equivalent once scaled
-        offsetX = zoomScale * zoomMidX;
-        offsetY = zoomScale * zoomMidY;
+        let offsetX = zoomScale * zoomMidX;
+        let offsetY = zoomScale * zoomMidY;
         // Find offset to centre, making sure no gap at left or top of holder
-        dleft = Math.min(0, $("svg").width() / 2 - offsetX);
-        dtop = Math.min(0, $("svg").height() / 2 - offsetY);
+        let dleft = Math.min(0, $("svg").width() / 2 - offsetX);
+        let dtop = Math.min(0, $("svg").height() / 2 - offsetY);
         // Make sure no gap at bottom or right of holder
         dleft = Math.max($("svg").width() - w * zoomScale, dleft);
         dtop = Math.max($("svg").height() - h * zoomScale, dtop);
@@ -228,8 +228,13 @@ function Load_Map() {
     );
 
     setTimeout(function(){
-        Draw_Circles(projection, "Dataset/Ncov_Inside_Hubei.csv");
-        Draw_Circles(projection, "Dataset/Ncov_Outside_Hubei.csv");
+        let g = d3.select("svg")
+            .append("g")
+            .attr("id", "circles-area")
+            .attr("transform", $("#map").attr("transform"));
+
+        Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
+        Draw_Circles(projection, g, "Dataset/Ncov_Outside_Hubei.csv");
     }, 1000);
 }
 
@@ -275,12 +280,7 @@ function Load_Map() {
     });
 }*/
 
-function Draw_Circles(projection, pathDataset) {
-    let g = d3.select("svg")
-        .append("g")
-        .attr("id", "test")
-        .attr("transform", $("#map").attr("transform"));
-
+function Draw_Circles(projection, g, pathDataset) {
     d3.csv(pathDataset, function(csv_data) {
         let circle = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
         let arrCircles = [];
@@ -300,7 +300,7 @@ function Draw_Circles(projection, pathDataset) {
                         !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
                         if (Math.sqrt(Math.pow(csv_data[i].latitude - csv_data[j].latitude, 2) -
-                            Math.pow(csv_data[i].longitude - csv_data[j].longitude, 2)) <= 0.5) {
+                            Math.pow(csv_data[i].longitude - csv_data[j].longitude, 2)) <= 1) {
 
                             arr[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
                             totInfected++;
@@ -315,6 +315,7 @@ function Draw_Circles(projection, pathDataset) {
                 if (totInfected < 10) {
                     g.append("circle")
                         .attr("fill", "white")
+                        .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
                         .attr("r", 4);
@@ -322,29 +323,33 @@ function Draw_Circles(projection, pathDataset) {
                 else if (totInfected >= 10 && totInfected < 100) {
                     g.append("circle")
                         .attr("fill", "green")
-                        .attr("cx", coordinates[0])
-                        .attr("cy", coordinates[1])
-                        .attr("r", 6);
-                }
-                else if (totInfected >= 100 && totInfected < 500) {
-                    g.append("circle")
-                        .attr("fill", "yellow")
+                        .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
                         .attr("r", 8);
                 }
+                else if (totInfected >= 100 && totInfected < 500) {
+                    g.append("circle")
+                        .attr("fill", "yellow")
+                        .attr("stroke", "black")
+                        .attr("cx", coordinates[0])
+                        .attr("cy", coordinates[1])
+                        .attr("r", 16);
+                }
                 else if (totInfected >= 500 && totInfected < 1000) {
                     g.append("circle")
                         .attr("fill", "orange")
+                        .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
-                        .attr("r", 10);
+                        .attr("r", 25);
                 } else {
                     g.append("circle")
                         .attr("fill", "red")
+                        .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
-                        .attr("r", 12);
+                        .attr("r", 40);
                 }
             }
         }
