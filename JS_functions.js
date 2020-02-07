@@ -295,40 +295,40 @@ function Draw_Circles(svg, projection) {
                     }
                 }
                 arrCircles[circle - 1] = [circle, totInfected, sumLatitudes/totInfected, sumLongitudes/totInfected];
-                let cordinates = projection(arrCircles[circle - 1][3].toString(), arrCircles[circle - 1][2].toString());
+                let coordinates = projection([sumLongitudes/totInfected, sumLatitudes/totInfected]);
 
                 if (totInfected < 10) {
                     svg.append("circle")
                         .attr("fill", "white")
-                        .attr("cx", cordinates[0])
-                        .attr("cy", cordinates[1])
+                        .attr("cx", coordinates[0])
+                        .attr("cy", coordinates[1])
                         .attr("r", 4);
                 }
                 else if (totInfected >= 10 && totInfected < 100) {
                     svg.append("circle")
                         .attr("fill", "green")
-                        .attr("cx", cordinates[0])
-                        .attr("cy", cordinates[1])
+                        .attr("cx", coordinates[0])
+                        .attr("cy", coordinates[1])
                         .attr("r", 6);
                 }
                 else if (totInfected >= 100 && totInfected < 500) {
                     svg.append("circle")
                         .attr("fill", "yellow")
-                        .attr("cx", cordinates[0])
-                        .attr("cy", cordinates[1])
+                        .attr("cx", coordinates[0])
+                        .attr("cy", coordinates[1])
                         .attr("r", 8);
                 }
                 else if (totInfected >= 500 && totInfected < 1000) {
                     svg.append("circle")
                         .attr("fill", "orange")
-                        .attr("cx", cordinates[0])
-                        .attr("cy", cordinates[1])
+                        .attr("cx", coordinates[0])
+                        .attr("cy", coordinates[1])
                         .attr("r", 10);
                 } else {
                     svg.append("circle")
                         .attr("fill", "red")
-                        .attr("cx", cordinates[0])
-                        .attr("cy", cordinates[1])
+                        .attr("cx", coordinates[0])
+                        .attr("cy", coordinates[1])
                         .attr("r", 12);
                 }
             }
