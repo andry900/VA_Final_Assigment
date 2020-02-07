@@ -363,6 +363,7 @@ function Draw_Circles(projection, g, pathDataset) {
 }
 
 function Mouse_Over(g,tot_infected) {
+
     g.select("circle").append("text")//appending it to path's parent which is the g(group) DOM
         .attr("transform", function() {
             return "rotate(" + computeTextRotation(d) + ")";
