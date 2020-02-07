@@ -288,7 +288,7 @@ function Draw_Circles(projection, pathDataset) {
 
         for (let i = 0; i < csv_data.length; i++) {
             if (arr[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
-                !isNaN(parseInt(csv_data[i].latitude)) && !isNaN(parseInt(csv_data[i].longitude))) {
+                !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
                 totInfected = 1;
                 sumLatitudes = parseFloat(csv_data[i].latitude);
@@ -297,7 +297,7 @@ function Draw_Circles(projection, pathDataset) {
                 arr[csv_data[i].ID - 1] = [csv_data[i].ID, circle, csv_data[i].latitude, csv_data[i].longitude];
                 for (let j = 1; j < csv_data.length; j++) {
                     if (arr[csv_data[j].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
-                        !isNaN(parseInt(csv_data[i].latitude)) && !isNaN(parseInt(csv_data[i].longitude))) {
+                        !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
                         if (Math.sqrt(Math.pow(csv_data[i].latitude - csv_data[j].latitude, 2) -
                             Math.pow(csv_data[i].longitude - csv_data[j].longitude, 2)) <= 0.5) {
