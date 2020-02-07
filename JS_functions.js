@@ -30,7 +30,7 @@ function Load_Map() {
         ;
         countriesGroup.attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
 
-        if ($("#circles-area") != undefined) {
+        if ($("#circles-area").length > 0) {
             $("#circles-area").attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
         }
     }
@@ -77,8 +77,8 @@ function Load_Map() {
         let zoomWidth = Math.abs(minXY[0] - maxXY[0]);
         let zoomHeight = Math.abs(minXY[1] - maxXY[1]);
         // find midpoint of map area defined
-       let zoomMidX = centroid[0];
-       let zoomMidY = centroid[1];
+        let zoomMidX = centroid[0];
+        let zoomMidY = centroid[1];
         // increase map area to include padding
         zoomWidth = zoomWidth * (1 + paddingPerc / 100);
         zoomHeight = zoomHeight * (1 + paddingPerc / 100);
@@ -228,14 +228,18 @@ function Load_Map() {
     );
 
     setTimeout(function(){
-        let g = d3.select("svg")
-            .append("g")
-            .attr("id", "circles-area")
-            .attr("transform", $("#map").attr("transform"));
-
-        Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
-        Draw_Circles(projection, g, "Dataset/Ncov_Outside_Hubei.csv");
+        Prepare_Circles_Area(projection);
     }, 1000);
+}
+
+function Prepare_Circles_Area(projection) {
+    let g = d3.select("svg")
+        .append("g")
+        .attr("id", "circles-area")
+        .attr("transform", $("#map").attr("transform"));
+
+    Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
+    Draw_Circles(projection, g, "Dataset/Ncov_Outside_Hubei.csv");
 }
 
 /*function Load_CSV() {
@@ -299,8 +303,8 @@ function Draw_Circles(projection, g, pathDataset) {
                     if (arr[csv_data[j].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
                         !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
-                        if (Math.sqrt(Math.pow(csv_data[i].latitude - csv_data[j].latitude, 2) -
-                            Math.pow(csv_data[i].longitude - csv_data[j].longitude, 2)) <= 1) {
+                        if (Math.sqrt(Math.pow(parseFloat(csv_data[i].latitude) - parseFloat(csv_data[j].latitude), 2) -
+                            Math.pow(parseFloat(csv_data[i].longitude) - parseFloat(csv_data[j].longitude), 2)) <= 1) {
 
                             arr[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
                             totInfected++;
@@ -356,4 +360,26 @@ function Draw_Circles(projection, g, pathDataset) {
         console.log(arr);
         console.log(arrCircles);
     });
+}
+
+function Mouse_Over(g,tot_infected) {
+    g.select("circle").append("text")//appending it to path's parent which is the g(group) DOM
+        .attr("transform", function() {
+            return "rotate(" + computeTextRotation(d) + ")";
+        })
+        .attr("x", function() {
+            return y(d.y);
+        })
+        .attr("dx", "6") // margin
+        .attr("dy", ".35em") // vertical-align
+        .attr("class", "mylabel")//adding a label class
+        .text(function() {
+            return d.name;
+        });
+}
+
+function Mouse_Out() {
+    function mouseOut() {
+        d3.selectAll(".mylabel").remove()//this will remove the text on mouse out
+    }
 }
