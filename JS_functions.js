@@ -348,40 +348,55 @@ function Draw_Circles(projection, g, pathDataset) {
 
         for (let i = 0; i < circles_data.length; i++) {
             if (circles_data[i][0] < 10) {
-                g.append("circle")
+                let circle = g.append("circle")
                     .attr("class", "white")
                     .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 8);
+                let tooltip = Tooltip_Creation(circles_data[i]);
+                circle.on("mouseover",Mouseover(tooltip));
+                circle.on("mouseout",Mouseout(tooltip));
             } else if (circles_data[i][0] >= 10 && circles_data[i][0] < 100) {
-                g.append("circle")
+                let circle = g.append("circle")
                     .attr("class", "green")
                     .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 12);
+                let tooltip = Tooltip_Creation(circles_data[i]);
+                circle.on("mouseover",Mouseover(tooltip));
+                circle.on("mouseout",Mouseout(tooltip));
             } else if (circles_data[i][0] >= 100 && circles_data[i][0] < 500) {
-                g.append("circle")
+                let circle = g.append("circle")
                     .attr("class", "yellow")
                     .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 18);
+                let tooltip = Tooltip_Creation(circles_data[i]);
+                circle.on("mouseover",Mouseover(tooltip));
+                circle.on("mouseout",Mouseout(tooltip));
             } else if (circles_data[i][0] >= 500 && circles_data[i][0] < 1000) {
-                g.append("circle")
+                let circle = g.append("circle")
                     .attr("class", "orange")
                     .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 24);
+                let tooltip = Tooltip_Creation(circles_data[i]);
+                circle.on("mouseover",Mouseover(tooltip));
+                circle.on("mouseout",Mouseout(tooltip));
             } else {
-                g.append("circle")
+               let circle = g.append("circle")
                     .attr("class", "red")
                     .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 30);
+                let tooltip = Tooltip_Creation(circles_data[i]);
+                circle.on("mouseover",Mouseover(tooltip));
+                circle.on("mouseout",Mouseout(tooltip));
             }
         }
         //console.log(infected_data);
@@ -389,24 +404,26 @@ function Draw_Circles(projection, g, pathDataset) {
     });
 }
 
-function Mouse_Over(g,tot_infected) {
-    g.select("circle").append("text")//appending it to path's parent which is the g(group) DOM
-        .attr("transform", function() {
-            return "rotate(" + computeTextRotation(d) + ")";
-        })
-        .attr("x", function() {
-            return y(d.y);
-        })
-        .attr("dx", "6") // margin
-        .attr("dy", ".35em") // vertical-align
-        .attr("class", "mylabel")//adding a label class
-        .text(function() {
-            return d.name;
-        });
+function Mouseover(tooltip) {
+    return tooltip.style("visibility","visible");
+}
+function Mouseout(tooltip){
+    return tooltip.style("visibility","hidden");
 }
 
-function Mouse_Out() {
-    function mouseOut() {
-        d3.selectAll(".mylabel").remove()//this will remove the text on mouse out
-    }
+function Tooltip_Creation(data){
+    let tooltip = d3.select("svg")
+        .append("div")
+        .style("visibility", "hidden")
+        .attr("class", "tooltip")
+        .style("background-color", "white")
+        .style("border", "solid")
+        .style("border-width", "2px")
+        .style("border-radius", "5px")
+        .style("padding", "5px")
+        .style("left", data[1][0]+"px")
+        .style("top", data[1][1]+"px")
+        .text("i am a circle");
+    return tooltip;
 }
+
