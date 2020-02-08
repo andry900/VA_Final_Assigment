@@ -31,9 +31,9 @@ function Load_Map() {
         countriesGroup.attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
 
         if ($("#circles-area").length > 0) {
-            $("#circles-area").attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
-
             let k = d3.event.transform.k;
+
+            $("#circles-area").attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
 
             d3.selectAll('circle.white')
                 .attr("r", 4/k)
@@ -250,16 +250,6 @@ function Load_Map() {
     }, 1000);
 }
 
-function Prepare_Circles_Area(projection) {
-    let g = d3.select("svg")
-        .append("g")
-        .attr("id", "circles-area")
-        .attr("transform", $("#map").attr("transform"));
-
-    Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
-    Draw_Circles(projection, g, "Dataset/Ncov_Outside_Hubei.csv");
-}
-
 /*function Load_CSV() {
     d3.csv("Dataset/Ncov_Inside_Hubei.csv", function(data) {
         let newData = new Array(data.length);
@@ -302,81 +292,100 @@ function Prepare_Circles_Area(projection) {
     });
 }*/
 
+function Prepare_Circles_Area(projection) {
+    let g = d3.select("svg")
+        .append("g")
+        .attr("id", "circles-area")
+        .attr("transform", $("#map").attr("transform"));
+
+    Draw_Circles(projection, g,"Dataset/Ncov_Outside_Hubei.csv");
+
+    setTimeout(function(){
+        Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
+    }, 500);
+}
+
 function Draw_Circles(projection, g, pathDataset) {
+    let circle = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
+    //let arrCircles = [];
+
     d3.csv(pathDataset, function(csv_data) {
-        let circle = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
-        let arrCircles = [];
-        let arr = new Array(csv_data.length).fill(Array(4));
+        let infected_data = new Array(csv_data.length).fill(Array(4));
+        let circles_data = [];
 
         for (let i = 0; i < csv_data.length; i++) {
-            if (arr[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
+            if (infected_data[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
                 !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
+                circle++;
                 totInfected = 1;
                 sumLatitudes = parseFloat(csv_data[i].latitude);
                 sumLongitudes = parseFloat(csv_data[i].longitude);
-                circle++;
-                arr[csv_data[i].ID - 1] = [csv_data[i].ID, circle, csv_data[i].latitude, csv_data[i].longitude];
+                infected_data[csv_data[i].ID - 1] = [csv_data[i].ID, circle, csv_data[i].latitude, csv_data[i].longitude];
+
                 for (let j = 1; j < csv_data.length; j++) {
-                    if (arr[csv_data[j].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
+                    if (infected_data[csv_data[j].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
                         !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
                         if (Math.sqrt(Math.pow(parseFloat(csv_data[i].latitude) - parseFloat(csv_data[j].latitude), 2) -
                             Math.pow(parseFloat(csv_data[i].longitude) - parseFloat(csv_data[j].longitude), 2)) <= 0.1) {
 
-                            arr[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
                             totInfected++;
                             sumLatitudes += parseFloat(csv_data[j].latitude);
                             sumLongitudes += parseFloat(csv_data[j].longitude);
+                            infected_data[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
                         }
                     }
                 }
-                arrCircles[circle - 1] = [circle, totInfected, sumLongitudes/totInfected, sumLatitudes/totInfected];
-                let coordinates = projection([sumLongitudes/totInfected, sumLatitudes/totInfected]);
-
-                if (totInfected < 10) {
-                    g.append("circle")
-                        .attr("class", "white")
-                        .attr("stroke", "black")
-                        .attr("cx", coordinates[0])
-                        .attr("cy", coordinates[1])
-                        .attr("r", 8);
-                }
-                else if (totInfected >= 10 && totInfected < 100) {
-                    g.append("circle")
-                        .attr("class", "green")
-                        .attr("stroke", "black")
-                        .attr("cx", coordinates[0])
-                        .attr("cy", coordinates[1])
-                        .attr("r", 12);
-                }
-                else if (totInfected >= 100 && totInfected < 500) {
-                    g.append("circle")
-                        .attr("class", "yellow")
-                        .attr("stroke", "black")
-                        .attr("cx", coordinates[0])
-                        .attr("cy", coordinates[1])
-                        .attr("r", 18);
-                }
-                else if (totInfected >= 500 && totInfected < 1000) {
-                    g.append("circle")
-                        .attr("class", "orange")
-                        .attr("stroke", "black")
-                        .attr("cx", coordinates[0])
-                        .attr("cy", coordinates[1])
-                        .attr("r", 24);
-                } else {
-                    g.append("circle")
-                        .attr("class", "red")
-                        .attr("stroke", "black")
-                        .attr("cx", coordinates[0])
-                        .attr("cy", coordinates[1])
-                        .attr("r", 30);
-                }
+                //arrCircles[circle - 1] = [circle, totInfected, sumLongitudes/totInfected, sumLatitudes/totInfected];
+                circles_data[circle - 1] = [totInfected, projection([sumLongitudes/totInfected, sumLatitudes/totInfected])];
             }
         }
-        console.log(arr);
-        console.log(arrCircles);
+
+        circles_data.sort(function(a, b) {
+            return a[0] - b[0];
+        });
+
+        for (let i = 0; i < circles_data.length; i++) {
+            if (circles_data[i][0] < 10) {
+                g.append("circle")
+                    .attr("class", "white")
+                    .attr("stroke", "black")
+                    .attr("cx", circles_data[i][1][0])
+                    .attr("cy", circles_data[i][1][1])
+                    .attr("r", 8);
+            } else if (circles_data[i][0] >= 10 && circles_data[i][0] < 100) {
+                g.append("circle")
+                    .attr("class", "green")
+                    .attr("stroke", "black")
+                    .attr("cx", circles_data[i][1][0])
+                    .attr("cy", circles_data[i][1][1])
+                    .attr("r", 12);
+            } else if (circles_data[i][0] >= 100 && circles_data[i][0] < 500) {
+                g.append("circle")
+                    .attr("class", "yellow")
+                    .attr("stroke", "black")
+                    .attr("cx", circles_data[i][1][0])
+                    .attr("cy", circles_data[i][1][1])
+                    .attr("r", 18);
+            } else if (circles_data[i][0] >= 500 && circles_data[i][0] < 1000) {
+                g.append("circle")
+                    .attr("class", "orange")
+                    .attr("stroke", "black")
+                    .attr("cx", circles_data[i][1][0])
+                    .attr("cy", circles_data[i][1][1])
+                    .attr("r", 24);
+            } else {
+                g.append("circle")
+                    .attr("class", "red")
+                    .attr("stroke", "black")
+                    .attr("cx", circles_data[i][1][0])
+                    .attr("cy", circles_data[i][1][1])
+                    .attr("r", 30);
+            }
+        }
+        //console.log(infected_data);
+        //console.log(arrCircles);
     });
 }
 
