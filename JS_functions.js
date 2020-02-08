@@ -32,6 +32,24 @@ function Load_Map() {
 
         if ($("#circles-area").length > 0) {
             $("#circles-area").attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
+
+            let k = d3.event.transform.k;
+
+            d3.selectAll('circle.white')
+                .attr("r", 4/k)
+                .attr("stroke-width", 0.5/k);
+            d3.selectAll('circle.green')
+                .attr("r", 6/k)
+                .attr("stroke-width", 0.5/k);
+            d3.selectAll('circle.yellow')
+                .attr("r", 9/k)
+                .attr("stroke-width", 0.5/k);
+            d3.selectAll('circle.orange')
+                .attr("r", 12/k)
+                .attr("stroke-width", 0.5/k);
+            d3.selectAll('circle.red')
+                .attr("r", 15/k)
+                .attr("stroke-width", 0.5/k);
         }
     }
 
@@ -304,7 +322,7 @@ function Draw_Circles(projection, g, pathDataset) {
                         !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
                         if (Math.sqrt(Math.pow(parseFloat(csv_data[i].latitude) - parseFloat(csv_data[j].latitude), 2) -
-                            Math.pow(parseFloat(csv_data[i].longitude) - parseFloat(csv_data[j].longitude), 2)) <= 1) {
+                            Math.pow(parseFloat(csv_data[i].longitude) - parseFloat(csv_data[j].longitude), 2)) <= 0.1) {
 
                             arr[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
                             totInfected++;
@@ -318,42 +336,42 @@ function Draw_Circles(projection, g, pathDataset) {
 
                 if (totInfected < 10) {
                     g.append("circle")
-                        .attr("fill", "white")
-                        .attr("stroke", "black")
-                        .attr("cx", coordinates[0])
-                        .attr("cy", coordinates[1])
-                        .attr("r", 4);
-                }
-                else if (totInfected >= 10 && totInfected < 100) {
-                    g.append("circle")
-                        .attr("fill", "green")
+                        .attr("class", "white")
                         .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
                         .attr("r", 8);
                 }
-                else if (totInfected >= 100 && totInfected < 500) {
+                else if (totInfected >= 10 && totInfected < 100) {
                     g.append("circle")
-                        .attr("fill", "yellow")
+                        .attr("class", "green")
                         .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
-                        .attr("r", 16);
+                        .attr("r", 12);
+                }
+                else if (totInfected >= 100 && totInfected < 500) {
+                    g.append("circle")
+                        .attr("class", "yellow")
+                        .attr("stroke", "black")
+                        .attr("cx", coordinates[0])
+                        .attr("cy", coordinates[1])
+                        .attr("r", 18);
                 }
                 else if (totInfected >= 500 && totInfected < 1000) {
                     g.append("circle")
-                        .attr("fill", "orange")
+                        .attr("class", "orange")
                         .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
-                        .attr("r", 25);
+                        .attr("r", 24);
                 } else {
                     g.append("circle")
-                        .attr("fill", "red")
+                        .attr("class", "red")
                         .attr("stroke", "black")
                         .attr("cx", coordinates[0])
                         .attr("cy", coordinates[1])
-                        .attr("r", 40);
+                        .attr("r", 30);
                 }
             }
         }
@@ -363,7 +381,6 @@ function Draw_Circles(projection, g, pathDataset) {
 }
 
 function Mouse_Over(g,tot_infected) {
-
     g.select("circle").append("text")//appending it to path's parent which is the g(group) DOM
         .attr("transform", function() {
             return "rotate(" + computeTextRotation(d) + ")";
