@@ -306,22 +306,24 @@ function Prepare_Circles_Area(projection) {
 }
 
 function Draw_Circles(projection, g, pathDataset) {
-    let circle = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
-    //let arrCircles = [];
+    let circle_ID = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
+    let circles_data = [], arrCircles = [];
 
     d3.csv(pathDataset, function(csv_data) {
         let infected_data = new Array(csv_data.length).fill(Array(4));
-        let circles_data = [];
+        //let markup = "<tr><td>" + csv_data[i].ID + "</td><td>" + csv_data[i].age + "</td></tr>";
+
+        //$('#infected_data tbody').append(markup);
 
         for (let i = 0; i < csv_data.length; i++) {
             if (infected_data[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
                 !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
 
-                circle++;
+                circle_ID++;
                 totInfected = 1;
                 sumLatitudes = parseFloat(csv_data[i].latitude);
                 sumLongitudes = parseFloat(csv_data[i].longitude);
-                infected_data[csv_data[i].ID - 1] = [csv_data[i].ID, circle, csv_data[i].latitude, csv_data[i].longitude];
+                infected_data[csv_data[i].ID - 1] = [csv_data[i].ID, circle_ID, csv_data[i].latitude, csv_data[i].longitude];
 
                 for (let j = 1; j < csv_data.length; j++) {
                     if (infected_data[csv_data[j].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
@@ -333,12 +335,12 @@ function Draw_Circles(projection, g, pathDataset) {
                             totInfected++;
                             sumLatitudes += parseFloat(csv_data[j].latitude);
                             sumLongitudes += parseFloat(csv_data[j].longitude);
-                            infected_data[csv_data[j].ID - 1] = [csv_data[j].ID, circle, csv_data[j].latitude, csv_data[j].longitude];
+                            infected_data[csv_data[j].ID - 1] = [csv_data[j].ID, circle_ID, csv_data[j].latitude, csv_data[j].longitude];
                         }
                     }
                 }
-                //arrCircles[circle - 1] = [circle, totInfected, sumLongitudes/totInfected, sumLatitudes/totInfected];
-                circles_data[circle - 1] = [totInfected, projection([sumLongitudes/totInfected, sumLatitudes/totInfected])];
+                //arrCircles[circle_ID - 1] = [circle_ID, totInfected, sumLongitudes/totInfected, sumLatitudes/totInfected];
+                circles_data[circle_ID - 1] = [totInfected, projection([sumLongitudes/totInfected, sumLatitudes/totInfected])];
             }
         }
 
@@ -347,57 +349,44 @@ function Draw_Circles(projection, g, pathDataset) {
         });
 
         for (let i = 0; i < circles_data.length; i++) {
+            let circle_HTML, tooltip;
+
+            tooltip = Tooltip_Creation(circles_data[i]);
+
             if (circles_data[i][0] < 10) {
-                let circle = g.append("circle")
+                circle_HTML = g.append("circle")
                     .attr("class", "white")
-                    .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 8);
-                let tooltip = Tooltip_Creation(circles_data[i]);
-                circle.on("mouseover",Mouseover(tooltip));
-                circle.on("mouseout",Mouseout(tooltip));
             } else if (circles_data[i][0] >= 10 && circles_data[i][0] < 100) {
-                let circle = g.append("circle")
+                circle_HTML = g.append("circle")
                     .attr("class", "green")
-                    .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 12);
-                let tooltip = Tooltip_Creation(circles_data[i]);
-                circle.on("mouseover",Mouseover(tooltip));
-                circle.on("mouseout",Mouseout(tooltip));
             } else if (circles_data[i][0] >= 100 && circles_data[i][0] < 500) {
-                let circle = g.append("circle")
+                circle_HTML = g.append("circle")
                     .attr("class", "yellow")
-                    .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 18);
-                let tooltip = Tooltip_Creation(circles_data[i]);
-                circle.on("mouseover",Mouseover(tooltip));
-                circle.on("mouseout",Mouseout(tooltip));
             } else if (circles_data[i][0] >= 500 && circles_data[i][0] < 1000) {
-                let circle = g.append("circle")
+                circle_HTML = g.append("circle")
                     .attr("class", "orange")
-                    .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 24);
-                let tooltip = Tooltip_Creation(circles_data[i]);
-                circle.on("mouseover",Mouseover(tooltip));
-                circle.on("mouseout",Mouseout(tooltip));
             } else {
-               let circle = g.append("circle")
+               circle_HTML = g.append("circle")
                     .attr("class", "red")
-                    .attr("stroke", "black")
                     .attr("cx", circles_data[i][1][0])
                     .attr("cy", circles_data[i][1][1])
                     .attr("r", 30);
-                let tooltip = Tooltip_Creation(circles_data[i]);
-                circle.on("mouseover",Mouseover(tooltip));
-                circle.on("mouseout",Mouseout(tooltip));
             }
+
+            circle_HTML.on("mouseover", Mouseover(tooltip));
+            circle_HTML.on("mouseout", Mouseout(tooltip));
         }
         //console.log(infected_data);
         //console.log(arrCircles);
@@ -405,25 +394,22 @@ function Draw_Circles(projection, g, pathDataset) {
 }
 
 function Mouseover(tooltip) {
-    return tooltip.style("visibility","visible");
+    return tooltip.style("visibility", "visible");
 }
+
 function Mouseout(tooltip){
-    return tooltip.style("visibility","hidden");
+    return tooltip.style("visibility", "hidden");
 }
 
 function Tooltip_Creation(data){
-    let tooltip = d3.select("svg")
+    let tooltip;
+
+    tooltip = d3.select("svg")
         .append("div")
-        .style("visibility", "hidden")
-        .attr("class", "tooltip")
-        .style("background-color", "white")
-        .style("border", "solid")
-        .style("border-width", "2px")
-        .style("border-radius", "5px")
-        .style("padding", "5px")
-        .style("left", data[1][0]+"px")
-        .style("top", data[1][1]+"px")
-        .text("i am a circle");
+        .attr("class", "circle_tooltip")
+        .text("I am a circle")
+        .style("left", data[1][0] + "px")
+        .style("top", data[1][1] + "px");
+
     return tooltip;
 }
-

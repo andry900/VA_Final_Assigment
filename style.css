@@ -57,6 +57,10 @@ svg rect {
 	fill: #30BCED;   /* country label background colour */
 }
 
+.white, .green, .yellow, .orange, .red {
+	stroke: black;
+}
+
 .white {
 	fill: white;
 }
@@ -75,4 +79,12 @@ svg rect {
 
 .red {
 	fill: red;
+}
+
+.circle_tooltip {
+	visibility: hidden;
+	background-color: white;
+	border: 2px solid;
+	border-radius: 5px;
+	padding: 5px;
 }
