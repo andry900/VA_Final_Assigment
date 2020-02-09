@@ -308,6 +308,7 @@ function Prepare_Circles_Area(projection) {
 function Draw_Circles(projection, g, pathDataset) {
     let circle_ID = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
     let circles_data = [], arrCircles = [];
+    let city, province, country;
 
     d3.csv(pathDataset, function(csv_data) {
         let infected_data = new Array(csv_data.length).fill(Array(4));
@@ -318,6 +319,27 @@ function Draw_Circles(projection, g, pathDataset) {
         for (let i = 0; i < csv_data.length; i++) {
             if (infected_data[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
                 !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
+
+                if (csv_data[i].city != "") {
+                    city = csv_data[i].city;
+                }
+                else {
+                    city = "N/A"
+                }
+
+                if (csv_data[i].province != "") {
+                    province = csv_data[i].province;
+                }
+                else {
+                    province = "N/A"
+                }
+
+                if (csv_data[i].country != "") {
+                    country = csv_data[i].country;
+                }
+                else {
+                    country = "N/A"
+                }
 
                 circle_ID++;
                 totInfected = 1;
@@ -340,7 +362,7 @@ function Draw_Circles(projection, g, pathDataset) {
                     }
                 }
                 //arrCircles[circle_ID - 1] = [circle_ID, totInfected, sumLongitudes/totInfected, sumLatitudes/totInfected];
-                circles_data[circle_ID - 1] = [totInfected, projection([sumLongitudes/totInfected, sumLatitudes/totInfected])];
+                circles_data[circle_ID - 1] = [totInfected, projection([sumLongitudes/totInfected, sumLatitudes/totInfected]), city, province, country];
             }
         }
 
@@ -349,67 +371,36 @@ function Draw_Circles(projection, g, pathDataset) {
         });
 
         for (let i = 0; i < circles_data.length; i++) {
-            let circle_HTML, tooltip;
-
-            tooltip = Tooltip_Creation(circles_data[i]);
+            let circle_HTML;
 
             if (circles_data[i][0] < 10) {
                 circle_HTML = g.append("circle")
                     .attr("class", "white")
-                    .attr("cx", circles_data[i][1][0])
-                    .attr("cy", circles_data[i][1][1])
                     .attr("r", 8);
             } else if (circles_data[i][0] >= 10 && circles_data[i][0] < 100) {
                 circle_HTML = g.append("circle")
                     .attr("class", "green")
-                    .attr("cx", circles_data[i][1][0])
-                    .attr("cy", circles_data[i][1][1])
                     .attr("r", 12);
             } else if (circles_data[i][0] >= 100 && circles_data[i][0] < 500) {
                 circle_HTML = g.append("circle")
                     .attr("class", "yellow")
-                    .attr("cx", circles_data[i][1][0])
-                    .attr("cy", circles_data[i][1][1])
                     .attr("r", 18);
             } else if (circles_data[i][0] >= 500 && circles_data[i][0] < 1000) {
                 circle_HTML = g.append("circle")
                     .attr("class", "orange")
-                    .attr("cx", circles_data[i][1][0])
-                    .attr("cy", circles_data[i][1][1])
                     .attr("r", 24);
             } else {
                circle_HTML = g.append("circle")
                     .attr("class", "red")
-                    .attr("cx", circles_data[i][1][0])
-                    .attr("cy", circles_data[i][1][1])
                     .attr("r", 30);
             }
 
-            circle_HTML.on("mouseover", Mouseover(tooltip));
-            circle_HTML.on("mouseout", Mouseout(tooltip));
+            circle_HTML.attr("cx", circles_data[i][1][0])
+                .attr("cy", circles_data[i][1][1])
+                .append("svg:title")
+                .text(circles_data[i][2] + ", " + circles_data[i][3] + ", " + circles_data[i][4] +  "\nN° of infected: " + circles_data[i][0]);
         }
         //console.log(infected_data);
         //console.log(arrCircles);
     });
-}
-
-function Mouseover(tooltip) {
-    return tooltip.style("visibility", "visible");
-}
-
-function Mouseout(tooltip){
-    return tooltip.style("visibility", "hidden");
-}
-
-function Tooltip_Creation(data){
-    let tooltip;
-
-    tooltip = d3.select("svg")
-        .append("div")
-        .attr("class", "circle_tooltip")
-        .text("I am a circle")
-        .style("left", data[1][0] + "px")
-        .style("top", data[1][1] + "px");
-
-    return tooltip;
 }
