@@ -2,23 +2,23 @@
 	position: fixed;
 	left: 0;
 	right: 0;
-	height: 50%;
 }
 
 .topDiv {
+	height: 49%;
 	top: 0;
 	border-bottom-style: solid;
 }
 
 .bottomDiv {
-	bottom: 0;
+	top: 50%;
+	bottom: 1%;
+	left: 0.5%;
+	right: 0.5%;
 }
 
 .bottomLeftDiv, .bottomRightDiv {
-	position: fixed;
-	top: 50%;
-	bottom: 0;
-	height: 50%;
+	height: 100%;
 	width: 50%;
 }
 
