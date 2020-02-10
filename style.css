@@ -1,34 +1,26 @@
-.topDiv, .bottomDiv {
+.topDiv {
 	position: fixed;
 	left: 0;
 	right: 0;
-}
-
-.topDiv {
-	height: 49%;
 	top: 0;
+	height: 49%;
 	border-bottom-style: solid;
 }
 
-.bottomDiv {
-	top: 50%;
-	bottom: 1%;
-	left: 0.5%;
-	right: 0.5%;
-}
-
 .bottomLeftDiv, .bottomRightDiv {
+	position: fixed;
+	top: 50%;
 	height: 100%;
-	width: 50%;
+	width: 49.5%;
 }
 
 .bottomLeftDiv {
-	left: 0;
+	left: 0.5%;
 	border-right-style: solid;
 }
 
 .bottomRightDiv {
-	right: 0;
+	right: 0.5%;
 }
 
 svg rect {
