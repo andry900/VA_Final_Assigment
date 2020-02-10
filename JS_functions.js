@@ -298,11 +298,9 @@ function Prepare_Circles_Area(projection) {
         .attr("id", "circles-area")
         .attr("transform", $("#map").attr("transform"));
 
-    Draw_Circles(projection, g,"Dataset/Ncov_Outside_Hubei.csv");
+    Draw_Circles(projection, g, "Dataset/World_Dataset.csv");
 
-    setTimeout(function(){
-        Draw_Circles(projection, g, "Dataset/Ncov_Inside_Hubei.csv");
-    }, 500);
+    Draw_Histogram();
 }
 
 function Draw_Circles(projection, g, pathDataset) {
@@ -312,9 +310,6 @@ function Draw_Circles(projection, g, pathDataset) {
 
     d3.csv(pathDataset, function(csv_data) {
         let infected_data = new Array(csv_data.length).fill(Array(4));
-        //let markup = "<tr><td>" + csv_data[i].ID + "</td><td>" + csv_data[i].age + "</td></tr>";
-
-        //$('#infected_data tbody').append(markup);
 
         for (let i = 0; i < csv_data.length; i++) {
             if (infected_data[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
@@ -397,10 +392,93 @@ function Draw_Circles(projection, g, pathDataset) {
 
             circle_HTML.attr("cx", circles_data[i][1][0])
                 .attr("cy", circles_data[i][1][1])
-                .append("svg:title")
+                .append("title")
                 .text(circles_data[i][2] + ", " + circles_data[i][3] + ", " + circles_data[i][4] +  "\nN° of infected: " + circles_data[i][0]);
         }
+
+        $('#infected_table').DataTable( {
+            data: infected_data,
+            responsive: true,
+            scrollY: "35vh"
+        });
+
         //console.log(infected_data);
         //console.log(arrCircles);
     });
+}
+
+function Draw_Histogram() {
+    let data = [{"age": "< 10 y.o", "quantity": 24},
+        {"age": "10-30 y.o", "quantity": 15},
+        {"age": "30-40 y.o", "quantity": 3},
+        {"age": "40-50 y.o", "quantity": 2},
+        {"age": ">50 y.o", "quantity": 30}];
+
+    // set the dimensions and margins of the graph
+    let margin = {top: 60, right: 60, bottom: 10, left: 100},
+        width = 880 - margin.left - margin.right,
+        height = 800 - margin.top - margin.bottom;
+
+    //append the svg object to the div
+    let svg = d3.selectAll("#histogram")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + 8*margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // X axis: scale and draw:
+    const xScale = d3.scaleBand()
+        .range([0, width])
+        .domain(data.map((s)=>s.age))
+        .padding(0.2);
+
+    svg.append('g')
+        .attr('transform', `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale))
+        .attr("font-size",25);
+
+    // Y axis: scale and draw:
+    const yScale = d3.scaleLinear()
+        .range([height, 0])
+        .domain([0, 100]); // from 0 to the number of tot infected for that circle
+
+    svg.append('g')
+        .call(d3.axisLeft(yScale))
+        .attr("font-size",25);
+
+    //create the svg for the grid
+    svg.selectAll()
+        .data([20,30,40,50,60])
+        .enter()
+        .append('rect')
+        .attr('x', (s) => xScale(s.age))
+        .attr('y', (s) => yScale(s.quantity))
+        .attr('height', (s) => height - yScale(s.quantity))
+        .attr('width', xScale.bandwidth());
+
+    //create the grid for the X axis
+    svg.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft()
+            .scale(yScale)
+            .tickSize(-width, 0, 0)
+            .tickFormat(''));
+
+    //append the label for X axis
+    svg.append('text')
+        .attr('x', -(height / 2.4) - margin.top - 20)
+        .attr('y', -margin.left / 2.4 - 10)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .attr("font-size",35)
+        .text('Number of infected cases');
+
+    //append the label for Y axis
+    svg.append('text')
+        .attr('x', width/2.4 + margin.right)
+        .attr('y', height + margin.bottom + 60)
+        .attr('text-anchor', 'middle')
+        .attr("font-size",35)
+        .text('Age group');
 }
