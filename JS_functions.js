@@ -299,65 +299,51 @@ function Prepare_Circles_Area(projection) {
         .attr("transform", $("#map").attr("transform"));
 
     Draw_Circles(projection, g, "Dataset/World_Dataset.csv");
-
-    Draw_Histogram();
 }
 
 function Draw_Circles(projection, g, pathDataset) {
     let circle_ID = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
-    let circles_data = [], arrCircles = [];
+    let circles_data = [], histogram_data = [];
     let city, province, country;
 
     d3.csv(pathDataset, function(csv_data) {
-        let infected_data = new Array(csv_data.length).fill(Array(4));
+        let table_data = new Array(csv_data.length).fill(Array(4));
 
         for (let i = 0; i < csv_data.length; i++) {
-            if (infected_data[csv_data[i].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
-                !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
-
-                if (csv_data[i].city != "") {
-                    city = csv_data[i].city;
-                }
-                else {
-                    city = "N/A"
-                }
-
-                if (csv_data[i].province != "") {
-                    province = csv_data[i].province;
-                }
-                else {
-                    province = "N/A"
-                }
-
-                if (csv_data[i].country != "") {
-                    country = csv_data[i].country;
-                }
-                else {
-                    country = "N/A"
-                }
+            if (table_data[csv_data[i].ID - 1][0] === undefined) {
+                let infected_data = [];
 
                 circle_ID++;
                 totInfected = 1;
                 sumLatitudes = parseFloat(csv_data[i].latitude);
                 sumLongitudes = parseFloat(csv_data[i].longitude);
-                infected_data[csv_data[i].ID - 1] = [csv_data[i].ID, circle_ID, csv_data[i].latitude, csv_data[i].longitude];
+                table_data[csv_data[i].ID - 1] = [csv_data[i].ID, csv_data[i].age, csv_data[i].sex, csv_data[i].city, csv_data[i].province,
+                    csv_data[i].country, csv_data[i].latitude, csv_data[i].longitude, csv_data[i].number_chroDiseases, csv_data[i].chronic_diseases,
+                    csv_data[i].dead_alive];
 
+                infected_data[0] = table_data[csv_data[i].ID - 1];
+
+                let count = 1;
                 for (let j = 1; j < csv_data.length; j++) {
-                    if (infected_data[csv_data[j].ID - 1][0] == undefined && !isNaN(parseInt(csv_data[i].ID)) &&
-                        !isNaN(parseFloat(csv_data[i].latitude)) && !isNaN(parseFloat(csv_data[i].longitude))) {
-
+                    if (table_data[csv_data[j].ID - 1][0] === undefined) {
                         if (Math.sqrt(Math.pow(parseFloat(csv_data[i].latitude) - parseFloat(csv_data[j].latitude), 2) -
                             Math.pow(parseFloat(csv_data[i].longitude) - parseFloat(csv_data[j].longitude), 2)) <= 0.1) {
 
                             totInfected++;
                             sumLatitudes += parseFloat(csv_data[j].latitude);
                             sumLongitudes += parseFloat(csv_data[j].longitude);
-                            infected_data[csv_data[j].ID - 1] = [csv_data[j].ID, circle_ID, csv_data[j].latitude, csv_data[j].longitude];
+                            table_data[csv_data[j].ID - 1] = [csv_data[j].ID, csv_data[j].age, csv_data[j].sex, csv_data[j].city, csv_data[j].province,
+                                csv_data[j].country, csv_data[j].latitude, csv_data[j].longitude, csv_data[j].number_chroDiseases, csv_data[j].chronic_diseases,
+                                csv_data[j].dead_alive];
+                            infected_data[count] = table_data[csv_data[j].ID - 1];
+
+                            count++;
                         }
                     }
                 }
-                //arrCircles[circle_ID - 1] = [circle_ID, totInfected, sumLongitudes/totInfected, sumLatitudes/totInfected];
+
                 circles_data[circle_ID - 1] = [totInfected, projection([sumLongitudes/totInfected, sumLatitudes/totInfected]), city, province, country];
+                histogram_data[circle_ID - 1] = infected_data;
             }
         }
 
@@ -393,21 +379,25 @@ function Draw_Circles(projection, g, pathDataset) {
             circle_HTML.attr("cx", circles_data[i][1][0])
                 .attr("cy", circles_data[i][1][1])
                 .append("title")
-                .text(circles_data[i][2] + ", " + circles_data[i][3] + ", " + circles_data[i][4] +  "\nN° of infected: " + circles_data[i][0]);
+                .text(circles_data[i][2] + ", " + circles_data[i][3] + ", " + circles_data[i][4] +
+                    "\nN° of infected: " + circles_data[i][0]);
         }
 
-        $('#infected_table').DataTable( {
-            data: infected_data,
+        $("#infected_table").DataTable({
+            data: table_data,
             responsive: true,
-            scrollY: "35vh"
+            scrollY: "35vh",
+            "scrollX": true
         });
 
-        //console.log(infected_data);
+        Draw_Histogram(histogram_data);
+
+        //console.log(table_data);
         //console.log(arrCircles);
     });
 }
 
-function Draw_Histogram() {
+function Draw_Histogram(histogram_data) {
     let data = [{"age": "< 10 y.o", "quantity": 24},
         {"age": "10-30 y.o", "quantity": 15},
         {"age": "30-40 y.o", "quantity": 3},
