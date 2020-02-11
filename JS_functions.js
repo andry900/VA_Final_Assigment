@@ -302,19 +302,18 @@ function Prepare_Circles_Area(projection) {
 }
 
 function Draw_Circles(projection, g, pathDataset) {
-    let circle_ID = 0, totInfected = 0, sumLatitudes = 0, sumLongitudes = 0;
-    let circles_data = [], histogram_data = [];
-    let city, province, country;
+    let circle_ID = 0, sumLatitudes = 0, sumLongitudes = 0;
+    let circles_data = [];
 
     d3.csv(pathDataset, function(csv_data) {
         let table_data = new Array(csv_data.length).fill(Array(4));
+        let table;
 
         for (let i = 0; i < csv_data.length; i++) {
             if (table_data[csv_data[i].ID - 1][0] === undefined) {
                 let infected_data = [];
 
                 circle_ID++;
-                totInfected = 1;
                 sumLatitudes = parseFloat(csv_data[i].latitude);
                 sumLongitudes = parseFloat(csv_data[i].longitude);
                 table_data[csv_data[i].ID - 1] = [csv_data[i].ID, csv_data[i].age, csv_data[i].sex, csv_data[i].city, csv_data[i].province,
@@ -329,7 +328,6 @@ function Draw_Circles(projection, g, pathDataset) {
                         if (Math.sqrt(Math.pow(parseFloat(csv_data[i].latitude) - parseFloat(csv_data[j].latitude), 2) -
                             Math.pow(parseFloat(csv_data[i].longitude) - parseFloat(csv_data[j].longitude), 2)) <= 0.1) {
 
-                            totInfected++;
                             sumLatitudes += parseFloat(csv_data[j].latitude);
                             sumLongitudes += parseFloat(csv_data[j].longitude);
                             table_data[csv_data[j].ID - 1] = [csv_data[j].ID, csv_data[j].age, csv_data[j].sex, csv_data[j].city, csv_data[j].province,
@@ -342,35 +340,34 @@ function Draw_Circles(projection, g, pathDataset) {
                     }
                 }
 
-                circles_data[circle_ID - 1] = [totInfected, projection([sumLongitudes/totInfected, sumLatitudes/totInfected]), city, province, country];
-                histogram_data[circle_ID - 1] = infected_data;
+                circles_data[circle_ID - 1] = [infected_data, projection([sumLongitudes/(infected_data.length), sumLatitudes/(infected_data.length)])];
             }
         }
 
         circles_data.sort(function(a, b) {
-            return a[0] - b[0];
+            return a[0].length - b[0].length;
         });
 
-        for (let i = 0; i < circles_data.length; i++) {
+        for (let i = 0; i < circles_data.length; i++) { // for every created circle (cluster of infected)
             let circle_HTML;
 
-            if (circles_data[i][0] < 10) {
+            if (circles_data[i][0].length < 10) {   // if the circle contains less then 10 persons
                 circle_HTML = g.append("circle")
                     .attr("class", "white")
                     .attr("r", 8);
-            } else if (circles_data[i][0] >= 10 && circles_data[i][0] < 100) {
+            } else if (circles_data[i][0].length >= 10 && circles_data[i][0].length < 100) {
                 circle_HTML = g.append("circle")
                     .attr("class", "green")
                     .attr("r", 12);
-            } else if (circles_data[i][0] >= 100 && circles_data[i][0] < 500) {
+            } else if (circles_data[i][0].length >= 100 && circles_data[i][0].length < 500) {
                 circle_HTML = g.append("circle")
                     .attr("class", "yellow")
                     .attr("r", 18);
-            } else if (circles_data[i][0] >= 500 && circles_data[i][0] < 1000) {
+            } else if (circles_data[i][0].length >= 500 && circles_data[i][0].length < 1000) {
                 circle_HTML = g.append("circle")
                     .attr("class", "orange")
                     .attr("r", 24);
-            } else {
+            } else {    // if the circle contains more then 999 persons
                circle_HTML = g.append("circle")
                     .attr("class", "red")
                     .attr("r", 30);
@@ -378,22 +375,32 @@ function Draw_Circles(projection, g, pathDataset) {
 
             circle_HTML.attr("cx", circles_data[i][1][0])
                 .attr("cy", circles_data[i][1][1])
-                .append("title")
-                .text(circles_data[i][2] + ", " + circles_data[i][3] + ", " + circles_data[i][4] +
-                    "\nN° of infected: " + circles_data[i][0]);
+                .on("click", function() {   // circle on click function
+                    table.destroy();    // destroy previous DataTable
+
+                    table = $("#infected_table").DataTable({ // create new DataTable with select circle data
+                        data: circles_data[i][0],
+                        responsive: true,
+                        scrollY: "35vh",
+                        "scrollX": true
+                    });
+
+                    Draw_Histogram(circles_data[i][0]); // update histogram data
+                })
+                .append("title") // tooltip with some information of infected inside a circle
+                .text(circles_data[i][0][0][3] + ", " + circles_data[i][0][0][4] + ", " + circles_data[i][0][0][5] +
+                    "\nN° of infected: " + circles_data[i][0].length);
         }
 
-        $("#infected_table").DataTable({
+        // create a DataTable with the infected all over the world
+        table = $("#infected_table").DataTable({
             data: table_data,
             responsive: true,
             scrollY: "35vh",
             "scrollX": true
         });
 
-        Draw_Histogram(histogram_data);
-
-        //console.log(table_data);
-        //console.log(arrCircles);
+        Draw_Histogram(circles_data[0]);
     });
 }
 
@@ -471,4 +478,8 @@ function Draw_Histogram(histogram_data) {
         .attr('text-anchor', 'middle')
         .attr("font-size",35)
         .text('Age group');
+}
+
+function Draw_PieChart() {
+
 }
