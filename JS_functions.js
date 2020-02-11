@@ -385,7 +385,7 @@ function Draw_Circles(projection, g, pathDataset) {
                         "scrollX": true
                     });
 
-                    Draw_Histogram(circles_data[i][0]); // update histogram data
+                    Draw_Histogram(circles_data[i][0], true); // update histogram data
                 })
                 .append("title") // tooltip with some information of infected inside a circle
                 .text(circles_data[i][0][0][3] + ", " + circles_data[i][0][0][4] + ", " + circles_data[i][0][0][5] +
@@ -400,21 +400,25 @@ function Draw_Circles(projection, g, pathDataset) {
             "scrollX": true
         });
 
-        Draw_Histogram(circles_data);
+        Draw_Histogram(circles_data, false);
     });
 }
 
-function Draw_Histogram(circles_data) {
+function Draw_Histogram(circles_data, bOnClick) {
     let unified_infected_data = [], ages_array = [], grouped_infected_data = [];
     let num_same_age = 0, num_males = 0, num_females = 0, num_dead = 0, num_alive = 0;
 
-    for(let x = 0; x < circles_data.length; x++) {
-        for(let y = 0; y < circles_data[x][0].length; y++) {
-            unified_infected_data.push(circles_data[x][0][y]);
+    if (bOnClick) {
+        unified_infected_data = circles_data;
+    } else {
+        for(let x = 0; x < circles_data.length; x++) {
+            for(let y = 0; y < circles_data[x][0].length; y++) {
+                unified_infected_data.push(circles_data[x][0][y]);
+            }
         }
     }
 
-    for(let x = 0; x < unified_infected_data.length; x++) {
+    for (let x = 0; x < unified_infected_data.length; x++) {
         if (!ages_array.includes(unified_infected_data[x][1])) {
             ages_array.push(unified_infected_data[x][1]);
             num_same_age = 1;
@@ -435,22 +439,22 @@ function Draw_Histogram(circles_data) {
                 num_alive = 0;
             }
 
-            for (let y = 1; y < unified_infected_data.length; y++) {
-                if (unified_infected_data[x][1] === unified_infected_data[y][1]) { // se hanno la stessa eta
+            for (let y = x + 1; y < unified_infected_data.length; y++) {
+                if (unified_infected_data[x][1] === unified_infected_data[y][1]) { // if 2 people have the same age
                     num_same_age++;
 
-                    if (unified_infected_data[y][2] === "male") { //se è un maschio
+                    if (unified_infected_data[y][2] === "male") {
                         num_males++;
-                        if (unified_infected_data[y][10] === "alive") { // se è un maschio vivo
+                        if (unified_infected_data[y][10] === "alive") {
                             num_alive++;
-                        } else { //se è un maschio morto
+                        } else {
                             num_dead++;
                         }
-                    } else { //se è femmina
+                    } else {
                         num_females++;
-                        if (unified_infected_data[y][10] === "alive") { //se è una femmina viva
+                        if (unified_infected_data[y][10] === "alive") {
                             num_alive++;
-                        } else { //se è una femmina morta
+                        } else {
                             num_dead++;
                         }
                     }
@@ -459,6 +463,8 @@ function Draw_Histogram(circles_data) {
             grouped_infected_data.push([parseInt(unified_infected_data[x][1]), num_same_age, num_males, num_females, num_dead, num_alive]);
         }
     }
+
+    console.log(grouped_infected_data);
 
     let histogram_data = [];
     let num_cases = 0;
@@ -483,7 +489,6 @@ function Draw_Histogram(circles_data) {
         }
     }
 
-    console.log(grouped_infected_data);
     /*
         let label = [{"age": "< 10 y.o", "quantity": 24},
             {"age": "10-30 y.o", "quantity": 15},
