@@ -37,8 +37,9 @@
 }
 
 .slice text {
-	font-size: 16pt;
+	font-size: 8pt;
 	font-family: Arial, serif;
+	font-weight: bold;
 }
 
 svg rect {

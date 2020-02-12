@@ -59,9 +59,9 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 58,57,female,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
 59,39,female,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
 60,70,female,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
-61,66,male,Wuhan City,Hubei,China,30.596415,114.27978,4,"hypertension, chronic obstructive pulmonary disease, diabetes, chronic renal insufficiency",dead
+61,66,male,Wuhan City,Hubei,China,30.596415,114.27978,4,"hypertension, COPD, diabetes, CKD",dead
 62,48,female,Wuhan City,Hubei,China,30.596415,114.27978,2,"diabetes, cerebral infarction",dead
-63,89,male,Wuhan City,Hubei,China,30.596415,114.27978,5,"hypertension, diabetes, coronary heart disease, frequent ventricular premature beat (FVPB), coronary artery stenting",dead
+63,89,male,Wuhan City,Hubei,China,30.596415,114.27978,5,"hypertension, diabetes, CHD, FVPB, coronary stenting",dead
 64,61,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
 65,69,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
 66,89,male,Wuhan City,Hubei,China,30.596415,114.27978,3,"hypertension, cerebral infarction, encephalomalacia",dead
@@ -69,13 +69,13 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 68,82,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
 69,66,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
 70,81,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
-71,82,female,Wuhan City,Hubei,China,30.596415,114.27978,2,"Parkinson's disease for five years, taking medicine of Madopar",dead
+71,82,female,Wuhan City,Hubei,China,30.596415,114.27978,1,parkinson,dead
 72,65,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
-73,80,female,Wuhan City,Hubei,China,30.596415,114.27978,3,"hypertension for more than 20 years, diabetes for more than 20 years, Parkinson's disease",dead
+73,80,female,Wuhan City,Hubei,China,30.596415,114.27978,3,"hypertension, diabetes, parkinson",dead
 74,53,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
-75,86,male,Wuhan City,Hubei,China,30.596415,114.27978,3,"hypertension, diabetes, colon cancer surgery four years ago",dead
+75,86,male,Wuhan City,Hubei,China,30.596415,114.27978,3,"hypertension, diabetes, colon cancer",dead
 76,70,female,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
-77,84,male,Wuhan City,Hubei,China,30.596415,114.27978,5,"chronic bronchitis, stenocardia, hypertension, coronary stenting, hemorrhage of digestive tract",dead
+77,84,male,Wuhan City,Hubei,China,30.596415,114.27978,5,"chronic bronchitis, stenocardia, hypertension, coronary stenting, digestive hemorrhage",dead
 78,65,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
 79,36,female,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
 80,39,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
@@ -222,8 +222,8 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 221,66,female,Wuhan City,Hubei,China,30.596415,114.27978,1,hypertension,dead
 222,58,male,Wuhan City,Hubei,China,30.596415,114.27978,1,hypertension,dead
 223,66,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
-224,78,male,Wuhan City,Hubei,China,30.596415,114.27978,1,coronary heart disease,dead
-225,65,male,Wuhan City,Hubei,China,30.596415,114.27978,2,"diabetes, coronary heart disease",dead
+224,78,male,Wuhan City,Hubei,China,30.596415,114.27978,1,CHD,dead
+225,65,male,Wuhan City,Hubei,China,30.596415,114.27978,2,"diabetes, CHD",dead
 226,67,male,Wuhan City,Hubei,China,30.596415,114.27978,1,chronic bronchitis,dead
 227,58,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
 228,67,female,Wuhan City,Hubei,China,30.596415,114.27978,2,"hypertension, diabetes",dead
@@ -233,7 +233,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 232,36,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
 233,73,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
 234,70,female,Wuhan City,Hubei,China,30.596415,114.27978,0,,dead
-235,81,male,Wuhan City,Hubei,China,30.596415,114.27978,4,"hypertension, coronary heart disease, diabetes, Tuberculosis",dead
+235,81,male,Wuhan City,Hubei,China,30.596415,114.27978,4,"hypertension, CHD, diabetes, tuberculosis",dead
 236,77,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
 237,26,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
 238,73,male,Wuhan City,Hubei,China,30.596415,114.27978,0,,alive
@@ -8454,7 +8454,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 8453,33,female,Bangkok,N/A,Thailand,13.76658,100.536288,0,,alive
 8454,60,female,Chicago,Illinois,United States,41.8781,-87.6298,0,,alive
 8455,35,male,Snohomish County,Washington State,United States,47.977747,-122.202158,1,hypertriglyceridemia ,alive
-8456,65,male,Nha Trang,Khanh Hoa province,Vietnam,12.2388,109.1967,4,"history of hypertension, type 2 diabetes, coronary heart disease for which a stent had been implanted, and lung cancer ",alive
+8456,65,male,Nha Trang,Khanh Hoa province,Vietnam,12.2388,109.1967,4,"hypertension, diabetes, CHD, lung cancer",alive
 8457,27,male,Nha Trang,Khanh Hoa province,Vietnam,12.2388,109.1967,0,,alive
 8458,40,male,N/A,Johor,Malaysia,1.990833,103.482778,0,,alive
 8459,35,male,Sydney,NSW,Australia,-33.8688,151.2093,0,,alive
@@ -9336,13 +9336,13 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 9335,81,male,Xinyang City,Henan,China,32.153093,114.092006,0,,alive
 9336,17,male,Xinyang City,Henan,China,32.153093,114.092006,0,,alive
 9337,18,male,Zhumadian,Henan,China,32.983333,114.033333,0,,alive
-9338,81,male,"Dongping County, Tai'an City ",Shandong,China,35.940602,116.468564,0,,alive
+9338,81,male,"Dongping County, Tai'an City",Shandong,China,35.940602,116.468564,0,,alive
 9339,20,male,"Shizhong District, Jinan City",Shandong,China,36.656166,116.993011,0,,alive
 9340,75,female,"Shizhong District, Jinan City",Shandong,China,36.656166,116.993011,0,,alive
 9341,35,female,"Shizhong District, Jinan City",Shandong,China,36.656166,116.993011,0,,alive
 9342,19,male,"Leling County, Dezhou City",Shandong,China,37.737994,117.234335,0,,alive
 9343,82,male,"Ningjin County, Dezhou City",Shandong,China,37.657002,116.787125,0,,alive
-9344,100,male,"Dongchangfu District, Liaocheng ",Shandong,China,36.434722,115.988333,0,,alive
+9344,100,male,"Dongchangfu District, Liaocheng",Shandong,China,36.434722,115.988333,0,,alive
 9345,46,male,"Yicheng District, Zaozhuang",Shandong,China,34.777703,117.593963,0,,alive
 9346,92,male,"Huancui District, Weihai City",Shandong,China,37.501944,122.123056,0,,alive
 9347,34,female,"Donggang District, Rizhao City",Shandong,China,35.425278,119.462222,0,,alive
@@ -12354,7 +12354,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 12353,73,female,"Nguyen Thi Minh Khai, Ho Chi Minh",N/A,Vietnam,10.77845,106.693904,1,prostate hypertrophy,alive
 12354,25,female,Hotel Ton Dan Street,Nha Trang,Vietnam,12.237763,109.193574,0,,alive
 12355,53,male,Kerala,N/A,India,8.5,77,0,,alive
-12356,44,male,San Lazaro Hospital,Manila,Philippines,14.613843,120.980567,1,"""thought to have had other pre-existing conditions""",dead
+12356,44,male,San Lazaro Hospital,Manila,Philippines,14.613843,120.980567,1,other,dead
 12357,24,female,London,Ontario,Canada,42.983611,-81.249722,0,,alive
 12358,49,female,"Permai Hospital, Johor",N/A,Malaysia,1.523149,103.7034062,0,,alive
 12359,17,male,Santa Clara County,California,United States,37.0914594,-121.7613146,0,,alive
@@ -13447,7 +13447,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 13446,69,female,Tianjin,Tianjin,China,39.340824,117.361329,0,,alive
 13447,9,male,Tianjin,Tianjin,China,39.340824,117.361329,0,,alive
 13448,61,male,Tianjin,Tianjin,China,39.340824,117.361329,0,,alive
-13449,51,male,"Baoji, High Tech Zone, ",Shaanxi,China,34.378007,107.905653,0,,alive
+13449,51,male,"Baoji, High Tech Zone,",Shaanxi,China,34.378007,107.905653,0,,alive
 13450,27,female,"Hezhang County, Bijie City",Guizhou,China,27.115802,104.669058,0,,alive
 13451,29,male,"Hezhang County, Bijie City",Guizhou,China,27.115802,104.669058,0,,alive
 13452,56,female,"Dafang County, Bijie City",Guizhou,China,27.154359,105.593097,0,,alive
@@ -13471,7 +13471,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 13470,78,male,Kundulun,Inner Mongolia,China,40.642,109.8378,0,,alive
 13471,24,female,Kundulun,Inner Mongolia,China,40.642,109.8378,0,,alive
 13472,21,male,Kundulun,Inner Mongolia,China,40.642,109.8378,0,,alive
-13473,56,female,"Linxi County, Chifeng City ",Inner Mongolia,China,43.616667,118.066667,0,,alive
+13473,56,female,"Linxi County, Chifeng City",Inner Mongolia,China,43.616667,118.066667,0,,alive
 13474,63,male,"Manzhouli City, Hulunbuir City",Inner Mongolia,China,49.595502,117.377885,0,,alive
 13475,27,male,"Guiding County, Qiannan Prefecture",Guizhou,China,26.4,107.183333,0,,alive
 13476,72,female,"Saihan District, Hohhot",Inner Mongolia,China,40.7921,111.7019,0,,alive
@@ -13484,7 +13484,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 13483,33,male,Xianyang,Shaanxi,China,34.3416,108.9398,0,,alive
 13484,41,female,Xianyang,Shaanxi,China,34.3416,108.9398,0,,alive
 13485,82,female,"Yuquan District, Hohhot",Inner Mongolia,China,40.7537,111.6739,0,,alive
-13486,41,male,"Hanzhong City, Zhenba County, ",Shaanxi,China,33.066667,107.016667,0,,alive
+13486,41,male,"Hanzhong City, Zhenba County,",Shaanxi,China,33.066667,107.016667,0,,alive
 13487,30,male,Zunyi City,Guizhou,China,27.683333,106.9,0,,alive
 13488,25,male,"183 Ma Tau Wai Road, To Kwa Wan",Hong Kong,China,22.319558,114.187767,0,,alive
 13489,75,male,Ankang,Shaanxi,China,32.897496,108.503056,0,,alive

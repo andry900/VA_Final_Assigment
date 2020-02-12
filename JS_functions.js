@@ -650,8 +650,9 @@ function Draw_Histogram(histogram_data) {
 //TODO: far vedere l'html con le immaginine
 
 function Draw_PieChart(circles_data, bOnClick) {
-    let unified_infected_data = [], affected_chronic = [], tmp_diseases = [], diseases_array = [];
-    let num_tot_people, perc_chronic, num_tot_diseases = 0;
+    let unified_infected_data = [], affected_chronic = [], tmp_diseases = [], diseases_array = [], pieChart_data = [];
+    let num_tot_people, perc_chronic = 0, num_tot_diseases = 0, num_others = 0, w = 0, h = 0, r = 0
+    let color;
 
     if (bOnClick) {
         unified_infected_data = circles_data;
@@ -696,61 +697,106 @@ function Draw_PieChart(circles_data, bOnClick) {
         return arr.some(row => row.includes(search));
     }
 
-    d3.select("#pieChart").append("text").text = perc_chronic + "%";
+    if (perc_chronic > 0) {
+        d3.select("#pieChart")
+            .append("text")
+            .append("b")
+            .text("The percentage of people with chronic diseases out of " + num_tot_people + " is: " +
+                perc_chronic + "% (" + affected_chronic.length + " people)." +
+                " They are distributed in the following way:")
 
-    let w = $("#pieChart").width(),
-        h = $("#pieChart").height(),
-        r = ($("#pieChart").width() * 0.9)/2,
-        color = d3.scaleOrdinal(d3.schemeCategory20c);
+        h = $("#pieChart").height()/1.3;
+    }
+    else {
+        h = $("#pieChart").height();
+    }
 
-    let data = [];
+    w = $("#pieChart").width();
+    r = ($("#pieChart").width() * 0.7)/2;
+    color = d3.scaleOrdinal(d3.schemeCategory20c);
 
-    for (let x = 0; x < diseases_array.length; x++) {
-        data.push({
-            label: diseases_array[x][0],
-            value: ((diseases_array[x][1]/num_tot_diseases) * 100).toFixed(2)
+    if (num_tot_diseases > 0) {
+        for (let x = 0; x < diseases_array.length; x++) {
+            if (diseases_array[x][1] / num_tot_diseases >= 0.09) {
+                pieChart_data.push({
+                    disease: diseases_array[x][0],
+                    percentage: ((diseases_array[x][1] / num_tot_diseases) * 100).toFixed(2)
+                });
+            } else {
+                num_others += diseases_array[x][1] / num_tot_diseases;
+            }
+        }
+
+        if (num_others > 0) {
+            pieChart_data.push({
+                disease: "other",
+                percentage: (num_others * 100).toFixed(2)
+            });
+        }
+    }
+    else {
+        pieChart_data.push({
+            disease: "Nobody has chronic diseases",
+            percentage: 100
         });
     }
 
     let vis = d3.select("#pieChart")
-        .append("svg")              //create the SVG element
-        .data([data])               //associate our data with the document
-        .attr("width", w)    // set the width and height of our visualization (these will be attributes of the <svg> tag
+        .append("svg")                  //create the SVG element
+        .data([pieChart_data])                   //associate our pieChart_data with the document
+        .attr("width", w)         // set the width and height of our visualization (these will be attributes of the <svg> tag
         .attr("height", h)
-        .append("g")                //make a group to hold our pie chart
-        .attr("transform", "translate(" + w/2 + "," + h/3.8 + ")");    //move the center of the pie chart from 0, 0 to radius, radius
+        .append("g")                    //make a group to hold our pie chart
+        .attr("transform", "translate(" + w/2 + "," + h/3.8 + ")");
 
-    let arc = d3.arc()              //this will create <path> elements for us using arc data
+    let arc = d3.arc()              //this will create <path> elements for us using arc pieChart_data
         .innerRadius(0)
         .outerRadius(r);
 
-    let pie = d3.pie()           //this will create arc data for us given a list of values
+    let pie = d3.pie()              //this will create arc pieChart_data for us given a list of values
         .value(function(d) {
-            return d.value;
-        });    //we must tell it out to access the value of each element in our data array
+            return d.percentage;
+    });                             //we must tell it out to access the value of each element in our pieChart_data array
 
-    let arcs = vis.selectAll("g.slice")     //this selects all <g> elements with class slice (there aren't any yet)
-        .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and
-        .enter()                            //this will create <g> elements for every "extra" data element that should be associated with
-                                            //a selection. The result is creating a <g> for every object in the data array
-        .append("g")                        //create a group to hold each slice (we will have a <path> and a <text>
+    let arcs = vis.selectAll("g.slice")         //this selects all <g> elements with class slice (there aren't any yet)
+        .data(pie)                              //associate the generated pie pieChart_data (an array of arcs, each having startAngle, endAngle and
+        .enter()                                //this will create <g> elements for every "extra" pieChart_data element that should be associated with
+                                                //a selection. The result is creating a <g> for every object in the pieChart_data array
+        .append("g")                            //create a group to hold each slice (we will have a <path> and a <text>
         .attr("class", "slice");    //allow us to style things in the slices (like text)
 
     arcs.append("path")
         .attr("fill", function(d, i) {
             return color(i);
-        }) //set the color for each slice to be chosen from the color function defined above
-        .attr("d", arc);                              //this creates the actual SVG path using the associated data (pie) with
-                                                            //the arc drawing function
+        })                                       //set the color for each slice to be chosen from the color function defined above
+        .attr("d", arc);                  //this creates the actual SVG path using the associated pieChart_data (pie) with the arc drawing function
+
     arcs.append("text")                                     //add a label to each slice
-        .attr("transform", function(d) {                    //set the label's origin to the center of the arc
-            //we have to make sure to set these before calling arc.centroid
+        .attr("transform", function(d) {       //set the label's origin to the center of the arc we have to make sure to set these before calling arc.centroid
             d.innerRadius = 0;
             d.outerRadius = r;
-            return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+
+            if (num_tot_diseases > 0) {
+                return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+            }
         })
-        .attr("text-anchor", "middle")                          //center the text on it's origin
+        .attr("text-anchor", "middle")              //center the text on it's origin
         .text(function(d, i) {
-            return data[i].label;
-        });        //get the label from our original data */
+            return pieChart_data[i].disease;
+        });                                                     //get the label from our original pieChart_data
+
+    if (num_tot_diseases > 0) {
+        arcs.append("text")
+            .attr("transform", function (d) {
+                let _d = arc.centroid(d);
+                _d[0] *= 2.5;	//multiply by a constant factor
+                _d[1] *= 2.3;	//multiply by a constant factor
+                return "translate(" + _d + ")";
+            })
+            .attr("dy", ".50em")
+            .style("text-anchor", "middle")
+            .text(function (d) {
+                return d.data.percentage + '%';
+            });
+    }
 }
