@@ -569,6 +569,12 @@ function Draw_Histogram(histogram_data) {
         .call(d3.axisLeft(yScale))
         .attr("font-size",10);
 
+    let myTool = d3.select("body")
+        .append("div")
+        .attr("class", "my_tooltip")
+        .style("opacity", "0")
+        .style("display", "none");
+
     //create the svg for the grid
     svg.selectAll("rect")
         .data(real_histogram_data)
@@ -589,19 +595,30 @@ function Draw_Histogram(histogram_data) {
                 .attr('stroke', '#007FFF')
                 .style("stroke-dasharray", ("3, 3"))
                 .style("stroke-width",3);
-
             d3.select(this).transition().style("fill","#4f6f49");
-            d3.select(this).html(" <div id='thumbnail'>" +
-                "<img src='Images/men_icon.png' height='20' width='20'/><title>" + d.numMales + "</title>" +
-                "<img src='Images/woman_icon.png' height='20' width='20'/><title>" + d.numFemales + "</title>" +
-                "<img src='Images/dead_icon.png' height='20' width='20'/><title>" + d.numDead + "</title>" +
-                "<img src='Images/alive_icon.png' height='20' width='20'/><title>" + d.numAlive + "</title>" +
+            myTool.transition()  //Opacity transition when the tooltip appears
+                .duration(500)
+                .style("opacity", "1")
+                .style("display", "block"); //The tooltip appears
+            myTool.html(" <div id='thumbnail'>" +
+                "<img src='Images/men_icon.png' height='20' width='20' style = 'display:inline;margin-left: 8px'/><p style = 'display:inline;margin-right: 10px'>" + d.numMales + "</p>" +
+                "<img src='Images/woman_icon.png' height='20' width='20' style = 'display:inline;margin-top: 2px'/><p style = 'display:inline;margin-right: 10px'>" + d.numFemales + "</p>" +
+                "</div>" +
+                "<div id='thumbnail2'>" +
+                "<img src='Images/dead_icon.png' height='20' width='20' style = 'display:inline'/><p style = 'display:inline;margin-right: 21px;margin-bottom: 2px'>" + d.numDead + "</p>" +
+                "<img src='Images/alive_icon.png' height='20' width='20' style = 'display:inline;margin-right: 2px'/><p style = 'display:inline'>" + d.numAlive + "</p>" +
                 "</div>"
-            );
+            )
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY) + "px");
         })
         .on("mouseout", function(d, i) {
             d3.select(this).transition().style("fill","333442");
-            svg.selectAll("#id_line").remove();//The tooltip disappears
+            svg.selectAll("#id_line").remove();
+            myTool.transition()  //Opacity transition when the tooltip disappears
+                .duration(500)
+                .style("opacity", "0")
+                .style("display", "none") //The tooltip disappears
         });
 
     //create the grid for the X axis
@@ -615,7 +632,7 @@ function Draw_Histogram(histogram_data) {
     //append the label for X axis
     svg.append('text')
         .attr('x', -(height / 2.4) - margin.top - 25)
-        .attr('y', -margin.left / 2.4 - 15)
+        .attr('y', -margin.left / 2.4 - 20)
         .attr('transform', 'rotate(-90)')
         .attr('text-anchor', 'middle')
         .attr("font-size",12)
@@ -624,7 +641,7 @@ function Draw_Histogram(histogram_data) {
     //append the label for Y axis
     svg.append('text')
         .attr('x', width/2.4 + margin.right)
-        .attr('y', height + margin.bottom + 20)
+        .attr('y', height + margin.bottom + 25)
         .attr('text-anchor', 'middle')
         .attr("font-size",12)
         .text('Age group');
