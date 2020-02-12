@@ -13447,7 +13447,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 13446,69,female,Tianjin,Tianjin,China,39.340824,117.361329,0,,alive
 13447,9,male,Tianjin,Tianjin,China,39.340824,117.361329,0,,alive
 13448,61,male,Tianjin,Tianjin,China,39.340824,117.361329,0,,alive
-13449,51,male,"Baoji, High Tech Zone,",Shaanxi,China,34.378007,107.905653,0,,alive
+13449,51,male,"Baoji, High Tech Zone",Shaanxi,China,34.378007,107.905653,0,,alive
 13450,27,female,"Hezhang County, Bijie City",Guizhou,China,27.115802,104.669058,0,,alive
 13451,29,male,"Hezhang County, Bijie City",Guizhou,China,27.115802,104.669058,0,,alive
 13452,56,female,"Dafang County, Bijie City",Guizhou,China,27.154359,105.593097,0,,alive
@@ -13484,7 +13484,7 @@ ID,age,sex,city,province,country,latitude,longitude,number_chroDiseases,chronic_
 13483,33,male,Xianyang,Shaanxi,China,34.3416,108.9398,0,,alive
 13484,41,female,Xianyang,Shaanxi,China,34.3416,108.9398,0,,alive
 13485,82,female,"Yuquan District, Hohhot",Inner Mongolia,China,40.7537,111.6739,0,,alive
-13486,41,male,"Hanzhong City, Zhenba County,",Shaanxi,China,33.066667,107.016667,0,,alive
+13486,41,male,"Hanzhong City, Zhenba County",Shaanxi,China,33.066667,107.016667,0,,alive
 13487,30,male,Zunyi City,Guizhou,China,27.683333,106.9,0,,alive
 13488,25,male,"183 Ma Tau Wai Road, To Kwa Wan",Hong Kong,China,22.319558,114.187767,0,,alive
 13489,75,male,Ankang,Shaanxi,China,32.897496,108.503056,0,,alive
