@@ -385,7 +385,11 @@ function Draw_Circles(projection, g, pathDataset) {
                         "scrollX": true
                     });
 
-                    Draw_Histogram(circles_data[i][0], true); // update histogram data
+                    $("#histogram").empty();
+                    Create_Data_Histogram(circles_data[i][0], true); // update histogram data
+
+                    $("#pieChart").empty();
+                    Draw_PieChart(circles_data[i][0], true);
                 })
                 .append("title") // tooltip with some information of infected inside a circle
                 .text(circles_data[i][0][0][3] + ", " + circles_data[i][0][0][4] + ", " + circles_data[i][0][0][5] +
@@ -400,19 +404,20 @@ function Draw_Circles(projection, g, pathDataset) {
             "scrollX": true
         });
 
-        Draw_Histogram(circles_data, false);
+        Create_Data_Histogram(circles_data, false);
+        Draw_PieChart(circles_data, false);
     });
 }
 
-function Draw_Histogram(circles_data, bOnClick) {
+function Create_Data_Histogram(circles_data, bOnClick) {
     let unified_infected_data = [], ages_array = [], grouped_infected_data = [];
     let num_same_age = 0, num_males = 0, num_females = 0, num_dead = 0, num_alive = 0;
 
     if (bOnClick) {
         unified_infected_data = circles_data;
     } else {
-        for(let x = 0; x < circles_data.length; x++) {
-            for(let y = 0; y < circles_data[x][0].length; y++) {
+        for (let x = 0; x < circles_data.length; x++) {
+            for (let y = 0; y < circles_data[x][0].length; y++) {
                 unified_infected_data.push(circles_data[x][0][y]);
             }
         }
@@ -464,124 +469,288 @@ function Draw_Histogram(circles_data, bOnClick) {
         }
     }
 
-    console.log(grouped_infected_data);
-
     let histogram_data = [];
-    let num_cases = 0;
+    for (let i = 0; i < 6; i++) {
+        histogram_data[i] = Prepare_Histogram(grouped_infected_data, i);
+    }
 
-    num_males = 0;
-    num_females = 0;
-    num_dead = 0;
-    num_alive = 0;
+    Draw_Histogram(histogram_data);
+}
 
+function Prepare_Histogram(grouped_infected_data, i){
+    let num_cases = 0, num_males = 0, num_females = 0, num_dead = 0, num_alive = 0;
+    let condition;
+    let histogram_data = [];
 
-    let x = grouped_infected_data[0].filter(function (age) {
-        return age < 10;
-    });
+    switch (i) {
+        case 0:
+            condition = "grouped_infected_data[j][0] < 10";
+            break;
+        case 1:
+            condition = "grouped_infected_data[j][0] >= 10 && grouped_infected_data[j][0] < 31 ";
+            break;
+        case 2:
+            condition = "grouped_infected_data[j][0] >= 31 && grouped_infected_data[j][0] < 51";
+            break;
+        case 3:
+            condition = "grouped_infected_data[j][0] >= 51 && grouped_infected_data[j][0] < 71";
+            break;
+        case 4:
+            condition = "grouped_infected_data[j][0] >= 71 && grouped_infected_data[j][0] < 91";
+            break;
+        case 5:
+            condition = "grouped_infected_data[j][0] >= 91 ";
+            break;
+    }
 
-    for(let i = 0; i < grouped_infected_data.length; i++) {
-        if (grouped_infected_data[i][0] < 10) {
-            num_cases += grouped_infected_data[i][1];
-            num_males += grouped_infected_data[i][2];
-            num_females += grouped_infected_data[i][3];
-            num_dead += grouped_infected_data[i][4];
-            num_alive += grouped_infected_data[i][5];
+    for (let j = 0; j < grouped_infected_data.length; j++) {
+        if (eval(condition)) {
+            num_cases += grouped_infected_data[j][1];
+            num_males += grouped_infected_data[j][2];
+            num_females += grouped_infected_data[j][3];
+            num_dead += grouped_infected_data[j][4];
+            num_alive += grouped_infected_data[j][5];
         }
     }
 
-    /*
-        let label = [{"age": "< 10 y.o", "quantity": 24},
-            {"age": "10-30 y.o", "quantity": 15},
-            {"age": "31-50 y.o", "quantity": 37},
-            {"age": "51-70 y.o", "quantity": 54},
-            {"age": ">71-90 y.o", "quantity": 49},
-            {"age": ">90 y.o", "quantity": 79}];
+    histogram_data = [num_cases, num_males, num_females, num_dead, num_alive];
 
-        // set the dimensions and margins of the graph
-        let margin = {top: 60, right: 60, bottom: 10, left: 100},
-            width = 880 - margin.left - margin.right,
-            height = 800 - margin.top - margin.bottom;
-
-        //append the svg object to the div
-        let svg = d3.selectAll("#histogram")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + 8*margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        // X axis: scale and draw:
-        const xScale = d3.scaleBand()
-            .range([0, width])
-            .domain(data.map((s)=>s.age))
-            .padding(0.2);
-
-        svg.append('g')
-            .attr('transform', `translate(0, ${height})`)
-            .call(d3.axisBottom(xScale))
-            .attr("font-size",25);
-
-        // Y axis: scale and draw:
-        const yScale = d3.scaleLinear()
-            .range([height, 0])
-            .domain([0, 100]); // from 0 to the number of tot infected for that circle
-
-        svg.append('g')
-            .call(d3.axisLeft(yScale))
-            .attr("font-size",25);
-
-        //create the svg for the grid
-        svg.selectAll("rect")
-            .data(data)
-            .enter()
-            .append("rect")
-            .attr("class", "bar")
-            .attr("transform", function(d) {
-                return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")"; })
-            .attr("width", xScale.bandwidth())
-            .attr("height", function(d) { return height - yScale(d.quantity); });
-
-        //create the grid for the X axis
-        svg.append('g')
-            .attr('class', 'grid')
-            .call(d3.axisLeft()
-                .scale(yScale)
-                .tickSize(-width, 0, 0)
-                .tickFormat(''));
-
-        //append the label for X axis
-        svg.append('text')
-            .attr('x', -(height / 2.4) - margin.top - 20)
-            .attr('y', -margin.left / 2.4 - 10)
-            .attr('transform', 'rotate(-90)')
-            .attr('text-anchor', 'middle')
-            .attr("font-size",35)
-            .text('Number of infected cases');
-
-        //append the label for Y axis
-        svg.append('text')
-            .attr('x', width/2.4 + margin.right)
-            .attr('y', height + margin.bottom + 60)
-            .attr('text-anchor', 'middle')
-            .attr("font-size",35)
-            .text('Age group');
-
-        svg.append("text")
-            .data(data)
-            .attr("dy", "1em")
-            .attr("dx", "2em")
-            .attr("transform", function(d) {
-                return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")"; })
-            .attr("y", yScale(data))
-            .attr("x", xScale(data))
-            .attr("font-size",25)
-            .attr("fill","white")
-            .attr("text-anchor", "middle")
-            .text(function(d,i) {return d[i].quantity;});
-     */
+    return histogram_data;
 }
 
+function Draw_Histogram(histogram_data) {
+    let real_histogram_data = [{"age": "< 10", "quantity": histogram_data[0][0],"numMales":histogram_data[0][1],
+        "numFemales":histogram_data[0][2],"numDead":histogram_data[0][3],"numAlive":histogram_data[0][4]},
+        {"age": "10-30", "quantity": histogram_data[1][0],"numMales":histogram_data[1][1],
+            "numFemales":histogram_data[1][2],"numDead":histogram_data[1][3],"numAlive":histogram_data[1][4]},
+        {"age": "31-50", "quantity": histogram_data[2][0],"numMales":histogram_data[2][1],
+            "numFemales":histogram_data[2][2],"numDead":histogram_data[2][3],"numAlive":histogram_data[2][4]},
+        {"age": "51-70", "quantity": histogram_data[3][0],"numMales":histogram_data[3][1],
+            "numFemales":histogram_data[3][2],"numDead":histogram_data[3][3],"numAlive":histogram_data[3][4]},
+        {"age": "71-90", "quantity": histogram_data[4][0],"numMales":histogram_data[4][1],
+            "numFemales":histogram_data[4][2],"numDead":histogram_data[4][3],"numAlive":histogram_data[4][4]},
+        {"age": "> 90", "quantity": histogram_data[5][0],"numMales":histogram_data[5][1],
+            "numFemales":histogram_data[5][2],"numDead":histogram_data[5][3],"numAlive":histogram_data[5][4]}];
 
-function Draw_PieChart() {
+    // set the dimensions and margins of the graph
+    let margin = {top: 30, right: 10, bottom: 10, left: 60},
+        width = 330 - margin.left - margin.right,
+        height = 280 - margin.top - margin.bottom;
 
+    //append the svg object to the div
+    let svg = d3.selectAll("#histogram")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + 8*margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // X axis: scale and draw:
+    const xScale = d3.scaleBand()
+        .range([0, width])
+        .domain(real_histogram_data.map((s)=>s.age))
+        .padding(0.2);
+
+    svg.append('g')
+        .attr('transform', `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale))
+        .attr("font-size",10);
+
+    let max_quantity = Math.max(histogram_data[0][0],histogram_data[1][0],histogram_data[2][0],
+    histogram_data[3][0],histogram_data[4][0],histogram_data[5][0]);
+    let scale_quantity = Math.round(max_quantity + Math.ceil((max_quantity*10)/100));
+
+    // Y axis: scale and draw:
+    const yScale = d3.scaleLinear()
+        .range([height, 0])
+        .domain([0, scale_quantity]); // from 0 to the number of tot infected for that circle
+
+    svg.append('g')
+        .call(d3.axisLeft(yScale))
+        .attr("font-size",10);
+
+    //create the svg for the grid
+    svg.selectAll("rect")
+        .data(real_histogram_data)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("transform", function(d) {
+            return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")"; })
+        .attr("width", xScale.bandwidth())
+        .attr("height", function(d) { return height - yScale(d.quantity); })
+        .on("mouseover", function(d) {
+            svg.append('line')
+                .attr("id","id_line")
+                .attr('x1', xScale)
+                .attr('y1', yScale(d.quantity))
+                .attr('x2', width)
+                .attr('y2', yScale(d.quantity))
+                .attr('stroke', '#007FFF')
+                .style("stroke-dasharray", ("3, 3"))
+                .style("stroke-width",3);
+
+            d3.select(this).transition().style("fill","#4f6f49");
+            d3.select(this).html(" <div id='thumbnail'>" +
+                "<img src='Images/men_icon.png' height='20' width='20'/><title>" + d.numMales + "</title>" +
+                "<img src='Images/woman_icon.png' height='20' width='20'/><title>" + d.numFemales + "</title>" +
+                "<img src='Images/dead_icon.png' height='20' width='20'/><title>" + d.numDead + "</title>" +
+                "<img src='Images/alive_icon.png' height='20' width='20'/><title>" + d.numAlive + "</title>" +
+                "</div>"
+            );
+        })
+        .on("mouseout", function(d, i) {
+            d3.select(this).transition().style("fill","333442");
+            svg.selectAll("#id_line").remove();//The tooltip disappears
+        });
+
+    //create the grid for the X axis
+    svg.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft()
+            .scale(yScale)
+            .tickSize(-width, 0, 0)
+            .tickFormat(''));
+
+    //append the label for X axis
+    svg.append('text')
+        .attr('x', -(height / 2.4) - margin.top - 25)
+        .attr('y', -margin.left / 2.4 - 15)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .attr("font-size",12)
+        .text('Number of infected cases');
+
+    //append the label for Y axis
+    svg.append('text')
+        .attr('x', width/2.4 + margin.right)
+        .attr('y', height + margin.bottom + 20)
+        .attr('text-anchor', 'middle')
+        .attr("font-size",12)
+        .text('Age group');
+
+    let formatCount = d3.format(",.0f");
+
+    svg.selectAll(null)
+        .data(real_histogram_data)
+        .enter()
+        .append("text")
+        .attr("dy", "1em")
+        .attr("dx", "1.8em")
+        .attr("y", function (d){yScale(d.quantity)})
+        .attr("x", function (d){yScale(d.age)})
+        .attr("font-size",10)
+        .attr("fill","white")
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+            return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")"; })
+        .text(function(d) {return formatCount(d.quantity);});
+}
+
+//TODO: far vedere l'html con le immaginine
+
+function Draw_PieChart(circles_data, bOnClick) {
+    let unified_infected_data = [], affected_chronic = [], tmp_diseases = [], diseases_array = [];
+    let num_tot_people, perc_chronic, num_tot_diseases = 0;
+
+    if (bOnClick) {
+        unified_infected_data = circles_data;
+    } else {
+        for(let x = 0; x < circles_data.length; x++) {
+            for(let y = 0; y < circles_data[x][0].length; y++) {
+                unified_infected_data.push(circles_data[x][0][y]);
+            }
+        }
+    }
+
+    num_tot_people = unified_infected_data.length;
+
+    for (let x = 0; x < num_tot_people; x++) {
+        if (unified_infected_data[x][8] > 0) {
+            affected_chronic.push([parseInt(unified_infected_data[x][8]), unified_infected_data[x][9]]);
+        }
+    }
+
+    perc_chronic = ((affected_chronic.length/num_tot_people) * 100).toFixed(2);
+
+    for (let x = 0; x < affected_chronic.length; x++) {
+        num_tot_diseases += affected_chronic[x][0];
+        tmp_diseases = affected_chronic[x][1].split(", ");
+
+        for (let y = 0; y < tmp_diseases.length; y++) {
+            if (!exists(diseases_array, tmp_diseases[y])) {
+                diseases_array.push([tmp_diseases[y], 1]);
+            }
+            else {
+                for(let i = 0; i < diseases_array.length; i++) {
+                    if(diseases_array[i][0] === tmp_diseases[y]) {
+                        diseases_array[i][1] += 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function exists(arr, search) {
+        return arr.some(row => row.includes(search));
+    }
+
+    d3.select("#pieChart").append("text").text = perc_chronic + "%";
+
+    let w = $("#pieChart").width(),
+        h = $("#pieChart").height(),
+        r = ($("#pieChart").width() * 0.9)/2,
+        color = d3.scaleOrdinal(d3.schemeCategory20c);
+
+    let data = [];
+
+    for (let x = 0; x < diseases_array.length; x++) {
+        data.push({
+            label: diseases_array[x][0],
+            value: ((diseases_array[x][1]/num_tot_diseases) * 100).toFixed(2)
+        });
+    }
+
+    let vis = d3.select("#pieChart")
+        .append("svg")              //create the SVG element
+        .data([data])               //associate our data with the document
+        .attr("width", w)    // set the width and height of our visualization (these will be attributes of the <svg> tag
+        .attr("height", h)
+        .append("g")                //make a group to hold our pie chart
+        .attr("transform", "translate(" + w/2 + "," + h/3.8 + ")");    //move the center of the pie chart from 0, 0 to radius, radius
+
+    let arc = d3.arc()              //this will create <path> elements for us using arc data
+        .innerRadius(0)
+        .outerRadius(r);
+
+    let pie = d3.pie()           //this will create arc data for us given a list of values
+        .value(function(d) {
+            return d.value;
+        });    //we must tell it out to access the value of each element in our data array
+
+    let arcs = vis.selectAll("g.slice")     //this selects all <g> elements with class slice (there aren't any yet)
+        .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and
+        .enter()                            //this will create <g> elements for every "extra" data element that should be associated with
+                                            //a selection. The result is creating a <g> for every object in the data array
+        .append("g")                        //create a group to hold each slice (we will have a <path> and a <text>
+        .attr("class", "slice");    //allow us to style things in the slices (like text)
+
+    arcs.append("path")
+        .attr("fill", function(d, i) {
+            return color(i);
+        }) //set the color for each slice to be chosen from the color function defined above
+        .attr("d", arc);                              //this creates the actual SVG path using the associated data (pie) with
+                                                            //the arc drawing function
+    arcs.append("text")                                     //add a label to each slice
+        .attr("transform", function(d) {                    //set the label's origin to the center of the arc
+            //we have to make sure to set these before calling arc.centroid
+            d.innerRadius = 0;
+            d.outerRadius = r;
+            return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+        })
+        .attr("text-anchor", "middle")                          //center the text on it's origin
+        .text(function(d, i) {
+            return data[i].label;
+        });        //get the label from our original data */
 }
