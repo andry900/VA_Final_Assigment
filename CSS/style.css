@@ -24,6 +24,23 @@
 	width: 46%;
 }
 
+#histogram {
+	width: 60%;
+	height: 100%;
+	float: left;
+}
+
+#pieChart {
+	width: 40%;
+	height: 100%;
+	float: right;
+}
+
+.slice text {
+	font-size: 16pt;
+	font-family: Arial, serif;
+}
+
 svg rect {
 	fill: #2A2C39;   /* map background colour */
 }
