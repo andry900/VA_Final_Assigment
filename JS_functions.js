@@ -630,6 +630,7 @@ function Draw_Histogram(histogram_data) {
         .text(function(d) {
             return formatCount(d.quantity);
         });
+    Pca_Legend(svg);
 }
 
 function Draw_PieChart(circles_data, bOnClick) {
@@ -782,4 +783,13 @@ function Draw_PieChart(circles_data, bOnClick) {
                 return d.data.percentage + '%';
             });
     }
+}
+
+function Pca_Legend(svg){
+    svg.append("circle").attr("cy",300).attr("r", 10).style("fill", "rgba(42,92,74,0.58)");
+    svg.append("circle").attr("cy",300).attr("cx",90).attr("r", 10).style("fill", "rgba(15,28,30,0.82)");
+    svg.append("circle").attr("cy",300).attr("cx",195).attr("r", 10).style("fill", "#05050b");
+    svg.append("text").attr("y", 305).attr("x",20).text("Low Risk").style("font-size", "10px");
+    svg.append("text").attr("y", 305).attr("x",110).text("Medium Risk").style("font-size", "10px");
+    svg.append("text").attr("y", 305).attr("x",215).text("High Risk",55).style("font-size", "10px");
 }
