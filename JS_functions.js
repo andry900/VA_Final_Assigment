@@ -35,19 +35,19 @@ function Load_Map() {
 
             $("#circles-area").attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
 
-            d3.selectAll('circle.white')
+            d3.selectAll('circle.small')
                 .attr("r", 4/k)
                 .attr("stroke-width", 0.5/k);
-            d3.selectAll('circle.green')
+            d3.selectAll('circle.medium_small')
                 .attr("r", 6/k)
                 .attr("stroke-width", 0.5/k);
-            d3.selectAll('circle.yellow')
+            d3.selectAll('circle.medium')
                 .attr("r", 9/k)
                 .attr("stroke-width", 0.5/k);
-            d3.selectAll('circle.orange')
+            d3.selectAll('circle.medium_big')
                 .attr("r", 12/k)
                 .attr("stroke-width", 0.5/k);
-            d3.selectAll('circle.red')
+            d3.selectAll('circle.big')
                 .attr("r", 15/k)
                 .attr("stroke-width", 0.5/k);
         }
@@ -245,52 +245,10 @@ function Load_Map() {
         }
     );
 
-    setTimeout(function(){
+    setTimeout(function() {
         Prepare_Circles_Area(projection);
     }, 1000);
 }
-
-/*function Load_CSV() {
-    d3.csv("Dataset/Ncov_Inside_Hubei.csv", function(data) {
-        let newData = new Array(data.length);
-
-        for (let i = 0; i < data.length; i++) {
-            let arrAges, avgAge;
-            let number_diseases = 0, arrDiseases;
-
-            if (data[i].age == ("")) {
-                data[i].age = Math.floor(Math.random() * 101);
-            }
-            else if (data[i].age.includes("-")) {
-                arrAges = data[i].age.split("-");
-                avgAge = (parseInt(arrAges[0]) + parseInt(arrAges[1]))/2;
-                data[i].age = Math.round(avgAge);
-            }
-            else {
-                data[i].age = parseInt(data[i].age);
-            }
-
-            if (data[i].sex == "") {
-                data[i].sex = Math.floor(Math.random() * 2); //0 is female, 1 is male
-            } else {
-                if (data[i].sex == "female") {
-                    data[i].sex = 0;
-                }
-                else {
-                    data[i].sex = 1;
-                }
-            }
-
-            if (data[i].chronic_diseases != "") {
-                arrDiseases = data[i].chronic_diseases.split(",");
-                number_diseases = arrDiseases.length;
-            }
-
-            newData[i] = [data[i].age, data[i].sex, number_diseases];
-        }
-        console.log(newData);
-    });
-}*/
 
 function Prepare_Circles_Area(projection) {
     let g = d3.select("svg")
@@ -304,6 +262,7 @@ function Prepare_Circles_Area(projection) {
 function Draw_Circles(projection, g, pathDataset) {
     let circle_ID = 0, sumLatitudes = 0, sumLongitudes = 0;
     let circles_data = [];
+    let previous_color = "", previous_circle = "";
 
     d3.csv(pathDataset, function(csv_data) {
         let table_data = new Array(csv_data.length).fill(Array(4));
@@ -353,29 +312,38 @@ function Draw_Circles(projection, g, pathDataset) {
 
             if (circles_data[i][0].length < 10) {   // if the circle contains less then 10 persons
                 circle_HTML = g.append("circle")
-                    .attr("class", "white")
+                    .attr("class", "small")
                     .attr("r", 8);
             } else if (circles_data[i][0].length >= 10 && circles_data[i][0].length < 100) {
                 circle_HTML = g.append("circle")
-                    .attr("class", "green")
+                    .attr("class", "medium_small")
                     .attr("r", 12);
             } else if (circles_data[i][0].length >= 100 && circles_data[i][0].length < 500) {
                 circle_HTML = g.append("circle")
-                    .attr("class", "yellow")
+                    .attr("class", "medium")
                     .attr("r", 18);
             } else if (circles_data[i][0].length >= 500 && circles_data[i][0].length < 1000) {
                 circle_HTML = g.append("circle")
-                    .attr("class", "orange")
+                    .attr("class", "medium_big")
                     .attr("r", 24);
             } else {    // if the circle contains more then 999 persons
                circle_HTML = g.append("circle")
-                    .attr("class", "red")
+                    .attr("class", "big")
                     .attr("r", 30);
             }
 
             circle_HTML.attr("cx", circles_data[i][1][0])
                 .attr("cy", circles_data[i][1][1])
                 .on("click", function() {   // circle on click function
+
+                    if (previous_circle !== "" ) {
+                        previous_circle.css("fill", previous_color);
+                    }
+
+                    previous_circle = $(this);
+                    previous_color = previous_circle.css("fill");
+
+                    $(this).css("fill", "green");
                     table.destroy();    // destroy previous DataTable
 
                     table = $("#infected_table").DataTable({ // create new DataTable with select circle data
@@ -533,7 +501,7 @@ function Draw_Histogram(histogram_data) {
             "numFemales":histogram_data[5][2],"numDead":histogram_data[5][3],"numAlive":histogram_data[5][4]}];
 
     // set the dimensions and margins of the graph
-    let margin = {top: 30, right: 10, bottom: 10, left: 60},
+    let margin = {top: 5, right: 10, bottom: 35, left: 60},
         width = 330 - margin.left - margin.right,
         height = 280 - margin.top - margin.bottom;
 
@@ -594,7 +562,7 @@ function Draw_Histogram(histogram_data) {
                 .attr('y2', yScale(d.quantity))
                 .attr('stroke', '#007FFF')
                 .style("stroke-dasharray", ("3, 3"))
-                .style("stroke-width",3);
+                .style("stroke-width", 3);
             d3.select(this).transition().style("fill","#4f6f49");
             myTool.transition()  //Opacity transition when the tooltip appears
                 .duration(500)
@@ -641,7 +609,7 @@ function Draw_Histogram(histogram_data) {
     //append the label for Y axis
     svg.append('text')
         .attr('x', width/2.4 + margin.right)
-        .attr('y', height + margin.bottom + 25)
+        .attr('y', height + margin.bottom)
         .attr('text-anchor', 'middle')
         .attr("font-size",12)
         .text('Age group');

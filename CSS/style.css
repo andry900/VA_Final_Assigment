@@ -43,11 +43,11 @@
 }
 
 svg rect {
-	fill: #2A2C39;   /* map background colour */
+	fill: black;   /* map background colour */
 }
 
 .country{
-	fill: #d0d0d0;  /* country colour */
+	fill: white;  /* country colour */
 	stroke: #2A2C39; /* country border colour */
 	stroke-width: 1; /* country border width */
 }
@@ -68,28 +68,28 @@ svg rect {
 	fill: #30BCED;   /* country label background colour */
 }
 
-.white, .green, .yellow, .orange, .red {
+.small, .medium_small, .medium, .medium_big, .big {
 	stroke: black;
 }
 
-.white {
-	fill: white;
+.small {
+	fill: #ffffb2;
 }
 
-.green {
-	fill: green;
+.medium_small {
+	fill: #fecc5c;
 }
 
-.yellow {
-	fill: yellow;
+.medium {
+	fill: #fd8d3c;
 }
 
-.orange {
-	fill: orange;
+.medium_big {
+	fill: #f03b20;
 }
 
-.red {
-	fill: red;
+.big {
+	fill: #bd0026;
 }
 
 .my_tooltip {
