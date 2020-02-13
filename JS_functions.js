@@ -13,21 +13,19 @@ function Load_Map() {
         .geoEquirectangular()
         .center([0, 15]) // set centre to further North as we are cropping more off bottom of map
         .scale([w / (2 * Math.PI)]) // scale to fit group width
-        .translate([w / 2, h / 2]) // ensure centred in group
-    ;
+        .translate([w / 2, h / 2]); // ensure centred in group
 
     // Define map path
     let path = d3
         .geoPath()
-        .projection(projection)
-    ;
+        .projection(projection);
 
     // Create function to apply zoom to countriesGroup
     function zoomed() {
         let t = d3
             .event
-            .transform
-        ;
+            .transform;
+
         countriesGroup.attr("transform", "translate(" + [t.x, t.y] + ")scale(" + t.k + ")");
 
         if ($("#circles-area").length > 0) {
@@ -56,16 +54,14 @@ function Load_Map() {
     // Define map zoom behaviour
     let zoom = d3
         .zoom()
-        .on("zoom", zoomed)
-    ;
+        .on("zoom", zoomed);
 
     function getTextBox(selection) {
         selection
             .each(function(d) {
                 d.bbox = this
                     .getBBox();
-            })
-        ;
+            });
     }
 
     // Function that calculates zoom/pan limits and sets zoom to default value
@@ -76,10 +72,8 @@ function Load_Map() {
         maxZoom = 20 * minZoom;
         // set extent of zoom to chosen values
         // set translate extent so that panning can't cause map to move out of viewport
-        zoom
-            .scaleExtent([minZoom, maxZoom])
-            .translateExtent([[0, 0], [w, h]])
-        ;
+        zoom.scaleExtent([minZoom, maxZoom])
+            .translateExtent([[0, 0], [w, h]]);
         // define X and Y offset for centre of map to be shown in centre of holder
         let midX = ($("#map-holder").width() - minZoom * w) / 2;
         let midY = ($("#map-holder").height() - minZoom * h) / 2;
@@ -550,9 +544,12 @@ function Draw_Histogram(histogram_data) {
         .append("rect")
         .attr("class", "bar")
         .attr("transform", function(d) {
-            return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")"; })
+            return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")";
+        })
         .attr("width", xScale.bandwidth())
-        .attr("height", function(d) { return height - yScale(d.quantity); })
+        .attr("height", function(d) {
+            return height - yScale(d.quantity);
+        })
         .on("mouseover", function(d) {
             svg.append('line')
                 .attr("id","id_line")
@@ -577,8 +574,8 @@ function Draw_Histogram(histogram_data) {
                 "<img src='Images/alive_icon.png' height='20' width='20' style = 'display:inline;margin-right: 2px'/><p style = 'display:inline'>" + d.numAlive + "</p>" +
                 "</div>"
             )
-                .style("left", (d3.event.pageX) + "px")
-                .style("top", (d3.event.pageY) + "px");
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY) + "px");
         })
         .on("mouseout", function(d, i) {
             d3.select(this).transition().style("fill","black");
@@ -628,15 +625,16 @@ function Draw_Histogram(histogram_data) {
         .attr("fill","white")
         .attr("text-anchor", "middle")
         .attr("transform", function(d) {
-            return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")"; })
-        .text(function(d) {return formatCount(d.quantity);});
+            return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")";
+        })
+        .text(function(d) {
+            return formatCount(d.quantity);
+        });
 }
-
-//TODO: far vedere l'html con le immaginine
 
 function Draw_PieChart(circles_data, bOnClick) {
     let unified_infected_data = [], affected_chronic = [], tmp_diseases = [], diseases_array = [], pieChart_data = [];
-    let num_tot_people, perc_chronic = 0, num_tot_diseases = 0, num_others = 0, w = 0, h = 0, r = 0
+    let num_tot_people, perc_chronic, num_tot_diseases = 0, num_others = 0, w, h, r = 0;
     let color;
 
     if (bOnClick) {
@@ -688,7 +686,7 @@ function Draw_PieChart(circles_data, bOnClick) {
             .append("b")
             .text("The percentage of people with chronic diseases out of " + num_tot_people + " is: " +
                 perc_chronic + "% (" + affected_chronic.length + " people)." +
-                " They are distributed in the following way:")
+                " They are distributed in the following way:");
 
         h = $("#pieChart").height()/1.3;
     }

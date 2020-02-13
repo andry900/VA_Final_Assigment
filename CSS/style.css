@@ -25,18 +25,19 @@
 }
 
 #histogram {
-	width: 60%;
+	width: 50%;
 	height: 100%;
 	float: left;
+	border-right-style: solid;
 }
 
 #pieChart {
-	width: 40%;
+	width: 48%;
 	height: 100%;
 	float: right;
 }
 
-.slice text {
+.slice, #pieChart text {
 	font-size: 8pt;
 	font-family: Arial, serif;
 	font-weight: bold;
