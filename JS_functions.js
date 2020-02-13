@@ -696,7 +696,7 @@ function Draw_PieChart(circles_data, bOnClick) {
 
     w = $("#pieChart").width();
     r = ($("#pieChart").width() * 0.7)/2;
-    color = d3.scaleOrdinal().range(["#ffffb2", "#fecc5c","#fd8d3c", "#f03b20", "#bd0026"]);
+    color = d3.scaleOrdinal(d3.schemeCategory20c);
 
     if (num_tot_diseases > 0) {
         for (let x = 0; x < diseases_array.length; x++) {

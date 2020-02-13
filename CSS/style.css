@@ -20,19 +20,19 @@
 }
 
 .bottomRightDiv {
-	right: 0.5%;
-	width: 46%;
+	right: 0.2%;
+	width: 46.3%;
 }
 
 #histogram {
-	width: 50%;
+	width: 51%;
 	height: 100%;
 	float: left;
 	border-right-style: solid;
 }
 
 #pieChart {
-	width: 48%;
+	width: 47%;
 	height: 100%;
 	float: right;
 }
