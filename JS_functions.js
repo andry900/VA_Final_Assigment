@@ -560,10 +560,10 @@ function Draw_Histogram(histogram_data) {
                 .attr('y1', yScale(d.quantity))
                 .attr('x2', width)
                 .attr('y2', yScale(d.quantity))
-                .attr('stroke', '#007FFF')
+                .attr('stroke', 'red')
                 .style("stroke-dasharray", ("3, 3"))
                 .style("stroke-width", 3);
-            d3.select(this).transition().style("fill","#4f6f49");
+            d3.select(this).transition().style("fill","#fd8d3c");
             myTool.transition()  //Opacity transition when the tooltip appears
                 .duration(500)
                 .style("opacity", "1")
@@ -581,7 +581,7 @@ function Draw_Histogram(histogram_data) {
                 .style("top", (d3.event.pageY) + "px");
         })
         .on("mouseout", function(d, i) {
-            d3.select(this).transition().style("fill","333442");
+            d3.select(this).transition().style("fill","black");
             svg.selectAll("#id_line").remove();
             myTool.transition()  //Opacity transition when the tooltip disappears
                 .duration(500)
