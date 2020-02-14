@@ -806,11 +806,11 @@ function Draw_PieChart(circles_data, bOnClick) {
 }
 
 function Pca_Legend(svg){
-    svg.append("text").attr("y",300).attr("x",-20).text("*Risk that an uninfected person could contract the virus").style("font-size","10px");
-    svg.append("circle").attr("cy",330).attr("cx",-12).attr("r", 10).style("fill", "rgba(42,92,74,0.58)");
-    svg.append("circle").attr("cy",330).attr("cx",80).attr("r", 10).style("fill", "rgba(15,28,30,0.82)");
-    svg.append("circle").attr("cy",330).attr("cx",185).attr("r", 10).style("fill", "#05050b");
-    svg.append("text").attr("y", 335).attr("x",10).text("Low Risk").style("font-size", "10px");
-    svg.append("text").attr("y", 335).attr("x",100).text("Medium Risk").style("font-size", "10px");
-    svg.append("text").attr("y", 335).attr("x",205).text("High Risk").style("font-size", "10px");
+    svg.append("circle").attr("cy",300).attr("cx",-12).attr("r", 10).style("fill", "rgba(42,92,74,0.58)");
+    svg.append("circle").attr("cy",300).attr("cx",80).attr("r", 10).style("fill", "rgba(15,28,30,0.82)");
+    svg.append("circle").attr("cy",300).attr("cx",185).attr("r", 10).style("fill", "#05050b");
+    svg.append("text").attr("y", 305).attr("x",10).text("Low Risk").style("font-size", "10px");
+    svg.append("text").attr("y", 305).attr("x",100).text("Medium Risk").style("font-size", "10px");
+    svg.append("text").attr("y", 305).attr("x",205).text("High Risk *").style("font-size", "10px");
+    svg.append("text").attr("y",330).attr("x",-20).text("* Risk that a healthy person may contract SARS-CoV-2").style("font-size","10px");
 }
