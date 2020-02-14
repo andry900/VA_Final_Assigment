@@ -542,7 +542,14 @@ function Draw_Histogram(histogram_data) {
         .data(real_histogram_data)
         .enter()
         .append("rect")
-        .attr("class", "bar")
+        .attr("fill", function (d) {
+            if (d.age === "< 10" || d.age === "> 90") {
+                return "green";
+            }
+            else {
+                return "yellow";
+            }
+        })
         .attr("transform", function(d) {
             return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")";
         })

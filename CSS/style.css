@@ -43,7 +43,7 @@
 	font-weight: bold;
 }
 
-svg rect {
+#map {
 	fill: black;   /* map background colour */
 }
 
