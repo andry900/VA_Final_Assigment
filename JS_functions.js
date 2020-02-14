@@ -537,6 +537,8 @@ function Draw_Histogram(histogram_data) {
         .style("opacity", "0")
         .style("display", "none");
 
+    let barColor_lowRisk = "rgba(42,92,74,0.58)";
+    let barColor_mediumRisk = "rgba(15,28,30,0.82)";
     //create the svg for the grid
     svg.selectAll("rect")
         .data(real_histogram_data)
@@ -544,10 +546,10 @@ function Draw_Histogram(histogram_data) {
         .append("rect")
         .attr("fill", function (d) {
             if (d.age === "< 10" || d.age === "> 90") {
-                return "green";
+                return barColor_lowRisk;
             }
             else {
-                return "yellow";
+                return barColor_mediumRisk;
             }
         })
         .attr("transform", function(d) {
@@ -583,9 +585,20 @@ function Draw_Histogram(histogram_data) {
             )
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY) + "px");
+        }).on("mousemove",function () {
+            myTool
+                .style("left", (d3.event.pageX) + "px")
+                .style("top", (d3.event.pageY) + "px");
         })
         .on("mouseout", function(d, i) {
-            d3.select(this).transition().style("fill","black");
+            let current_color;
+            if (d.age === "< 10" || d.age === "> 90") {
+                current_color = barColor_lowRisk;
+            }
+            else {
+                current_color = barColor_mediumRisk;
+            }
+            d3.select(this).transition().style("fill",current_color);
             svg.selectAll("#id_line").remove();
             myTool.transition()  //Opacity transition when the tooltip disappears
                 .duration(500)
@@ -793,10 +806,11 @@ function Draw_PieChart(circles_data, bOnClick) {
 }
 
 function Pca_Legend(svg){
-    svg.append("circle").attr("cy",300).attr("r", 10).style("fill", "rgba(42,92,74,0.58)");
-    svg.append("circle").attr("cy",300).attr("cx",90).attr("r", 10).style("fill", "rgba(15,28,30,0.82)");
-    svg.append("circle").attr("cy",300).attr("cx",195).attr("r", 10).style("fill", "#05050b");
-    svg.append("text").attr("y", 305).attr("x",20).text("Low Risk").style("font-size", "10px");
-    svg.append("text").attr("y", 305).attr("x",110).text("Medium Risk").style("font-size", "10px");
-    svg.append("text").attr("y", 305).attr("x",215).text("High Risk",55).style("font-size", "10px");
+    svg.append("text").attr("y",300).attr("x",-20).text("*Risk that an uninfected person could contract the virus").style("font-size","10px");
+    svg.append("circle").attr("cy",330).attr("cx",-12).attr("r", 10).style("fill", "rgba(42,92,74,0.58)");
+    svg.append("circle").attr("cy",330).attr("cx",80).attr("r", 10).style("fill", "rgba(15,28,30,0.82)");
+    svg.append("circle").attr("cy",330).attr("cx",185).attr("r", 10).style("fill", "#05050b");
+    svg.append("text").attr("y", 335).attr("x",10).text("Low Risk").style("font-size", "10px");
+    svg.append("text").attr("y", 335).attr("x",100).text("Medium Risk").style("font-size", "10px");
+    svg.append("text").attr("y", 335).attr("x",205).text("High Risk").style("font-size", "10px");
 }
