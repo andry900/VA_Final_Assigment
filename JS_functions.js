@@ -537,8 +537,8 @@ function Draw_Histogram(histogram_data) {
         .style("opacity", "0")
         .style("display", "none");
 
-    let barColor_lowRisk = "rgba(42,92,74,0.58)";
-    let barColor_mediumRisk = "rgba(15,28,30,0.82)";
+    let barColor_lowRisk = "#969696";
+    let barColor_mediumRisk = "#525252";
     //create the svg for the grid
     svg.selectAll("rect")
         .data(real_histogram_data)
@@ -806,9 +806,9 @@ function Draw_PieChart(circles_data, bOnClick) {
 }
 
 function Pca_Legend(svg){
-    svg.append("circle").attr("cy",300).attr("cx",-12).attr("r", 10).style("fill", "rgba(42,92,74,0.58)");
-    svg.append("circle").attr("cy",300).attr("cx",80).attr("r", 10).style("fill", "rgba(15,28,30,0.82)");
-    svg.append("circle").attr("cy",300).attr("cx",185).attr("r", 10).style("fill", "#05050b");
+    svg.append("circle").attr("cy",300).attr("cx",-12).attr("r", 10).style("fill", "#969696");
+    svg.append("circle").attr("cy",300).attr("cx",80).attr("r", 10).style("fill", "#525252");
+    svg.append("circle").attr("cy",300).attr("cx",185).attr("r", 10).style("fill", "#000000");
     svg.append("text").attr("y", 305).attr("x",10).text("Low Risk").style("font-size", "10px");
     svg.append("text").attr("y", 305).attr("x",100).text("Medium Risk").style("font-size", "10px");
     svg.append("text").attr("y", 305).attr("x",205).text("High Risk *").style("font-size", "10px");
