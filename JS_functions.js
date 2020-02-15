@@ -664,7 +664,7 @@ function Draw_Histogram(histogram_data) {
 
 function Draw_PieChart(circles_data, bOnClick) {
     let unified_infected_data = [], affected_chronic = [], tmp_diseases = [], diseases_array = [], pieChart_data = [];
-    let num_tot_people, perc_chronic, num_tot_diseases = 0, num_others = 0, sum_ages = 0, w, h, r = 0;
+    let num_tot_people, perc_chronic, num_tot_diseases = 0, num_others = 0, sum_ages = 0, count = 0, w, h, r = 0;
     let color;
 
     if (bOnClick) {
@@ -689,17 +689,17 @@ function Draw_PieChart(circles_data, bOnClick) {
 
     for (let x = 0; x < affected_chronic.length; x++) {
         num_tot_diseases += affected_chronic[x][0];
-        sum_ages += parseInt(affected_chronic[x][2]);
         tmp_diseases = affected_chronic[x][1].split(", ");
 
         for (let y = 0; y < tmp_diseases.length; y++) {
             if (!exists(diseases_array, tmp_diseases[y])) {
-                diseases_array.push([tmp_diseases[y], 1]);
+                diseases_array.push([tmp_diseases[y], 1, parseInt(affected_chronic[x][2])]);
             }
             else {
                 for(let i = 0; i < diseases_array.length; i++) {
                     if(diseases_array[i][0] === tmp_diseases[y]) {
                         diseases_array[i][1] += 1;
+                        diseases_array[i][2] += parseInt(affected_chronic[x][2]);
                         break;
                     }
                 }
@@ -734,17 +734,21 @@ function Draw_PieChart(circles_data, bOnClick) {
             if (diseases_array[x][1] / num_tot_diseases >= 0.09) {
                 pieChart_data.push({
                     disease: diseases_array[x][0],
-                    percentage: ((diseases_array[x][1] / num_tot_diseases) * 100).toFixed(2)
+                    percentage: ((diseases_array[x][1] / num_tot_diseases) * 100).toFixed(2),
+                    avg_ages: diseases_array[x][2]/diseases_array[x][1]
                 });
             } else {
                 num_others += diseases_array[x][1] / num_tot_diseases;
+                sum_ages += diseases_array[x][2];
+                count += diseases_array[x][1];
             }
         }
 
         if (num_others > 0) {
             pieChart_data.push({
                 disease: "other",
-                percentage: (num_others * 100).toFixed(2)
+                percentage: (num_others * 100).toFixed(2),
+                avg_ages: sum_ages/count
             });
         }
     }
@@ -778,29 +782,28 @@ function Draw_PieChart(circles_data, bOnClick) {
                                                 //a selection. The result is creating a <g> for every object in the pieChart_data array
         .append("g")                            //create a group to hold each slice (we will have a <path> and a <text>
         .attr("class", "slice")     //allow us to style things in the slices (like text)
-        .on("click", function () {
+        .on("click", function (d) {
             let bar_element;
-            let avg_ages = sum_ages / affected_chronic.length;
 
-            if (!isNaN(avg_ages)) {
-                if (avg_ages < 10) {
-                    bar_element = $("#10");
-                } else if (avg_ages >= 10 && avg_ages < 31) {
+            if (!isNaN(d["data"].avg_ages)) {   // verify if the average of ages is a number
+                if (d["data"].avg_ages < 10) {
+                    bar_element = $("#10");     // select the bar of babies with less then 10 years
+                } else if (d["data"].avg_ages >= 10 && d["data"].avg_ages < 31) {
                     bar_element = $("#10-30");
-                } else if (avg_ages >= 31 && avg_ages < 51) {
+                } else if (d["data"].avg_ages >= 31 && d["data"].avg_ages < 51) {
                     bar_element = $("#31-50");
-                } else if (avg_ages >= 51 && avg_ages < 71) {
+                } else if (d["data"].avg_ages >= 51 && d["data"].avg_ages < 71) {
                     bar_element = $("#51-70");
-                } else if (avg_ages >= 71 && avg_ages < 91) {
+                } else if (d["data"].avg_ages >= 71 && d["data"].avg_ages < 91) {
                     bar_element = $("#71-90");
                 } else {
                     bar_element = $("#90");
                 }
 
-                bar_element.attr("class", "blink_me");
+                bar_element.attr("class", "blink_me");  // set infinite blinking
 
                 setTimeout(function () {
-                    bar_element.removeClass("blink_me");
+                    bar_element.removeClass("blink_me");    // remove blinking after 3 sec
                 }, 3000);
             }
         });
