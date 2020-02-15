@@ -330,13 +330,13 @@ function Draw_Circles(projection, g, pathDataset) {
                 .on("click", function() {   // circle on click function
 
                     if (previous_circle !== "" ) {
-                        previous_circle.css("fill", previous_color);
+                        previous_circle.css("fill", previous_color);    // reset color of previous select circle
                     }
 
-                    previous_circle = $(this);
-                    previous_color = previous_circle.css("fill");
+                    previous_circle = $(this);  // store select circle
+                    previous_color = previous_circle.css("fill");   // store selected circle color
 
-                    $(this).css("fill", "green");
+                    $(this).css("fill", "green");      // fill select circle with green
                     table.destroy();    // destroy previous DataTable
 
                     table = $("#infected_table").DataTable({ // create new DataTable with select circle data
@@ -480,18 +480,18 @@ function Prepare_Histogram(grouped_infected_data, i){
 }
 
 function Draw_Histogram(histogram_data) {
-    let real_histogram_data = [{"age": "< 10", "quantity": histogram_data[0][0],"numMales":histogram_data[0][1],
-        "numFemales":histogram_data[0][2],"numDead":histogram_data[0][3],"numAlive":histogram_data[0][4]},
-        {"age": "10-30", "quantity": histogram_data[1][0],"numMales":histogram_data[1][1],
-            "numFemales":histogram_data[1][2],"numDead":histogram_data[1][3],"numAlive":histogram_data[1][4]},
-        {"age": "31-50", "quantity": histogram_data[2][0],"numMales":histogram_data[2][1],
-            "numFemales":histogram_data[2][2],"numDead":histogram_data[2][3],"numAlive":histogram_data[2][4]},
-        {"age": "51-70", "quantity": histogram_data[3][0],"numMales":histogram_data[3][1],
-            "numFemales":histogram_data[3][2],"numDead":histogram_data[3][3],"numAlive":histogram_data[3][4]},
-        {"age": "71-90", "quantity": histogram_data[4][0],"numMales":histogram_data[4][1],
-            "numFemales":histogram_data[4][2],"numDead":histogram_data[4][3],"numAlive":histogram_data[4][4]},
-        {"age": "> 90", "quantity": histogram_data[5][0],"numMales":histogram_data[5][1],
-            "numFemales":histogram_data[5][2],"numDead":histogram_data[5][3],"numAlive":histogram_data[5][4]}];
+    let real_histogram_data = [{"age": "< 10", "quantity": histogram_data[0][0], "numMales": histogram_data[0][1],
+        "numFemales": histogram_data[0][2], "numDead": histogram_data[0][3], "numAlive": histogram_data[0][4]},
+        {"age": "10-30", "quantity": histogram_data[1][0], "numMales": histogram_data[1][1],
+            "numFemales": histogram_data[1][2], "numDead": histogram_data[1][3], "numAlive": histogram_data[1][4]},
+        {"age": "31-50", "quantity": histogram_data[2][0], "numMales": histogram_data[2][1],
+            "numFemales": histogram_data[2][2], "numDead": histogram_data[2][3], "numAlive": histogram_data[2][4]},
+        {"age": "51-70", "quantity": histogram_data[3][0], "numMales": histogram_data[3][1],
+            "numFemales": histogram_data[3][2], "numDead": histogram_data[3][3], "numAlive": histogram_data[3][4]},
+        {"age": "71-90", "quantity": histogram_data[4][0], "numMales": histogram_data[4][1],
+            "numFemales": histogram_data[4][2], "numDead": histogram_data[4][3], "numAlive": histogram_data[4][4]},
+        {"age": "> 90", "quantity": histogram_data[5][0], "numMales": histogram_data[5][1],
+            "numFemales": histogram_data[5][2], "numDead": histogram_data[5][3], "numAlive": histogram_data[5][4]}];
 
     // set the dimensions and margins of the graph
     let margin = {top: 5, right: 10, bottom: 35, left: 60},
@@ -502,7 +502,7 @@ function Draw_Histogram(histogram_data) {
     let svg = d3.selectAll("#histogram")
         .append("svg")
         .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + 8*margin.bottom)
+        .attr("height", height + margin.top + 8 * margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -599,7 +599,7 @@ function Draw_Histogram(histogram_data) {
                 .style("left", (d3.event.pageX) + "px")
                 .style("top", (d3.event.pageY) + "px");
         })
-        .on("mouseout", function(d, i) {
+        .on("mouseout", function(d) {
             let current_color;
             if (d.age === "< 10" || d.age === "> 90") {
                 current_color = barColor_lowRisk;
@@ -648,8 +648,12 @@ function Draw_Histogram(histogram_data) {
         .append("text")
         .attr("dy", "1em")
         .attr("dx", "1.8em")
-        .attr("y", function (d){yScale(d.quantity)})
-        .attr("x", function (d){yScale(d.age)})
+        .attr("y", function (d){
+            yScale(d.quantity);
+        })
+        .attr("x", function (d){
+            yScale(d.age);
+        })
         .attr("font-size",10)
         .attr("fill","white")
         .attr("text-anchor", "middle")
@@ -659,6 +663,7 @@ function Draw_Histogram(histogram_data) {
         .text(function(d) {
             return formatCount(d.quantity);
         });
+
     Pca_Legend(svg);
 }
 
@@ -667,9 +672,9 @@ function Draw_PieChart(circles_data, bOnClick) {
     let num_tot_people, perc_chronic, num_tot_diseases = 0, num_others = 0, sum_ages = 0, count = 0, w, h, r = 0;
     let color;
 
-    if (bOnClick) {
+    if (bOnClick) {     // is true if the function is accessed by a circle click
         unified_infected_data = circles_data;
-    } else {
+    } else {    // the first pieChat load with all the data
         for(let x = 0; x < circles_data.length; x++) {
             for(let y = 0; y < circles_data[x][0].length; y++) {
                 unified_infected_data.push(circles_data[x][0][y]);
@@ -680,36 +685,36 @@ function Draw_PieChart(circles_data, bOnClick) {
     num_tot_people = unified_infected_data.length;
 
     for (let x = 0; x < num_tot_people; x++) {
-        if (unified_infected_data[x][8] > 0) {
+        if (unified_infected_data[x][8] > 0) {  // create a new array with people having chronicle diseases
             affected_chronic.push([parseInt(unified_infected_data[x][8]), unified_infected_data[x][9], unified_infected_data[x][1]]);
         }
     }
 
-    perc_chronic = ((affected_chronic.length/num_tot_people) * 100).toFixed(2);
-
     for (let x = 0; x < affected_chronic.length; x++) {
         num_tot_diseases += affected_chronic[x][0];
-        tmp_diseases = affected_chronic[x][1].split(", ");
+        tmp_diseases = affected_chronic[x][1].split(", ");  // split the diseases descriptions into an array
 
-        for (let y = 0; y < tmp_diseases.length; y++) {
-            if (!exists(diseases_array, tmp_diseases[y])) {
+        for (let y = 0; y < tmp_diseases.length; y++) {     // for all the diseases of a person
+            if (!exists(diseases_array, tmp_diseases[y])) {     // check if is a new disease
                 diseases_array.push([tmp_diseases[y], 1, parseInt(affected_chronic[x][2])]);
             }
             else {
                 for(let i = 0; i < diseases_array.length; i++) {
                     if(diseases_array[i][0] === tmp_diseases[y]) {
-                        diseases_array[i][1] += 1;
-                        diseases_array[i][2] += parseInt(affected_chronic[x][2]);
-                        break;
+                        diseases_array[i][1] += 1; // add a person to the count of a disease
+                        diseases_array[i][2] += parseInt(affected_chronic[x][2]);   // add the age of a person
+                        break;  // a person can have only 1 time the same disease...
                     }
                 }
             }
         }
     }
 
-    function exists(arr, search) {
+    function exists(arr, search) {  // to verify if a disease has been already considered
         return arr.some(row => row.includes(search));
     }
+
+    perc_chronic = ((affected_chronic.length/num_tot_people) * 100).toFixed(2);
 
     if (perc_chronic > 0) {
         d3.select("#pieChart")
@@ -729,22 +734,22 @@ function Draw_PieChart(circles_data, bOnClick) {
     r = ($("#pieChart").width() * 0.7)/2;
     color = d3.scaleOrdinal(d3.schemeCategory20c);
 
-    if (num_tot_diseases > 0) {
+    if (num_tot_diseases > 0) { // check if in a certain area at least 1 person has a chronicle disease
         for (let x = 0; x < diseases_array.length; x++) {
-            if (diseases_array[x][1] / num_tot_diseases >= 0.09) {
+            if (diseases_array[x][1] / num_tot_diseases >= 0.09) {  // check if more then 9% of the people has the disease
                 pieChart_data.push({
-                    disease: diseases_array[x][0],
+                    disease: diseases_array[x][0],  // disease name
                     percentage: ((diseases_array[x][1] / num_tot_diseases) * 100).toFixed(2),
-                    avg_ages: diseases_array[x][2]/diseases_array[x][1]
+                    avg_ages: diseases_array[x][2]/diseases_array[x][1] // average of ages of people with a certain disease
                 });
-            } else {
+            } else {    // sum up values of diseases with less then 9% of cases
                 num_others += diseases_array[x][1] / num_tot_diseases;
                 sum_ages += diseases_array[x][2];
                 count += diseases_array[x][1];
             }
         }
 
-        if (num_others > 0) {
+        if (num_others > 0) {       // the other slice is create with all the diseases with less then 9% of cases
             pieChart_data.push({
                 disease: "other",
                 percentage: (num_others * 100).toFixed(2),
@@ -753,7 +758,7 @@ function Draw_PieChart(circles_data, bOnClick) {
         }
     }
     else {
-        pieChart_data.push({
+        pieChart_data.push({    // full pie chart without data
             disease: "Nobody has chronic diseases",
             percentage: 100
         });
@@ -761,8 +766,8 @@ function Draw_PieChart(circles_data, bOnClick) {
 
     let vis = d3.select("#pieChart")
         .append("svg")                  //create the SVG element
-        .data([pieChart_data])                   //associate our pieChart_data with the document
-        .attr("width", w)         // set the width and height of our visualization (these will be attributes of the <svg> tag
+        .data([pieChart_data])          //associate our pieChart_data with the document
+        .attr("width", w)         // set the width and height of our visualization
         .attr("height", h)
         .append("g")                    //make a group to hold our pie chart
         .attr("transform", "translate(" + w/2 + "," + h/3.8 + ")");
@@ -774,18 +779,17 @@ function Draw_PieChart(circles_data, bOnClick) {
     let pie = d3.pie()              //this will create arc pieChart_data for us given a list of values
         .value(function(d) {
             return d.percentage;
-    });                             //we must tell it out to access the value of each element in our pieChart_data array
+        });                         //we must tell it out to access the value of each element in our pieChart_data array
 
-    let arcs = vis.selectAll("g.slice")         //this selects all <g> elements with class slice (there aren't any yet)
-        .data(pie)                              //associate the generated pie pieChart_data (an array of arcs, each having startAngle, endAngle and
-        .enter()                                //this will create <g> elements for every "extra" pieChart_data element that should be associated with
-                                                //a selection. The result is creating a <g> for every object in the pieChart_data array
-        .append("g")                            //create a group to hold each slice (we will have a <path> and a <text>
-        .attr("class", "slice")     //allow us to style things in the slices (like text)
+    let arcs = vis.selectAll("g.slice")
+        .data(pie)
+        .enter()
+        .append("g")
+        .attr("class", "slice")
         .on("click", function (d) {
-            let bar_element;
-
             if (!isNaN(d["data"].avg_ages)) {   // verify if the average of ages is a number
+                let bar_element;
+
                 if (d["data"].avg_ages < 10) {
                     bar_element = $("#10");     // select the bar of babies with less then 10 years
                 } else if (d["data"].avg_ages >= 10 && d["data"].avg_ages < 31) {
@@ -811,8 +815,8 @@ function Draw_PieChart(circles_data, bOnClick) {
     arcs.append("path")
         .attr("fill", function(d, i) {
             return color(i);
-        })                                       //set the color for each slice to be chosen from the color function defined above
-        .attr("d", arc);                  //this creates the actual SVG path using the associated pieChart_data (pie) with the arc drawing function
+        })                                    //set the color for each slice to be chosen from the color function defined above
+        .attr("d", arc);                //this creates the actual SVG path using the associated pieChart_data (pie) with the arc drawing function
 
     arcs.append("text")                                     //add a label to each slice
         .attr("transform", function(d) {       //set the label's origin to the center of the arc we have to make sure to set these before calling arc.centroid
@@ -820,20 +824,20 @@ function Draw_PieChart(circles_data, bOnClick) {
             d.outerRadius = r;
 
             if (num_tot_diseases > 0) {
-                return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+                return "translate(" + arc.centroid(d) + ")";
             }
         })
         .attr("text-anchor", "middle")              //center the text on it's origin
         .text(function(d, i) {
-            return pieChart_data[i].disease;
-        });                                                     //get the label from our original pieChart_data
+            return pieChart_data[i].disease;                    //get the disease from our original pieChart_data
+        });
 
-    if (num_tot_diseases > 0) {
+    if (num_tot_diseases > 0) {     // percentage labels
         arcs.append("text")
             .attr("transform", function (d) {
                 let _d = arc.centroid(d);
-                _d[0] *= 2.5;	//multiply by a constant factor
-                _d[1] *= 2.3;	//multiply by a constant factor
+                _d[0] *= 2.5;
+                _d[1] *= 2.3;
                 return "translate(" + _d + ")";
             })
             .attr("dy", ".50em")
@@ -847,7 +851,7 @@ function Draw_PieChart(circles_data, bOnClick) {
 function Pca_Legend(svg){
     svg.append("circle").attr("cy",300).attr("cx",-12).attr("r", 10).style("fill", "#969696");
     svg.append("circle").attr("cy",300).attr("cx",80).attr("r", 10).style("fill", "#525252");
-    svg.append("circle").attr("cy",300).attr("cx",185).attr("r", 10).style("fill", "#000000");
+    svg.append("circle").attr("cy",300).attr("cx",185).attr("r", 10).style("fill", "black");
     svg.append("text").attr("y", 305).attr("x",10).text("Low Risk").style("font-size", "10px");
     svg.append("text").attr("y", 305).attr("x",100).text("Medium Risk").style("font-size", "10px");
     svg.append("text").attr("y", 305).attr("x",205).text("High Risk *").style("font-size", "10px");
