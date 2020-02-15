@@ -724,7 +724,7 @@ function Draw_PieChart(circles_data, bOnClick) {
                 perc_chronic + "% (" + affected_chronic.length + " people)." +
                 " They are distributed in the following way:");
 
-        h = $("#pieChart").height()/1.3;
+        h = $("#pieChart").height()/1.2;
     }
     else {
         h = $("#pieChart").height();
