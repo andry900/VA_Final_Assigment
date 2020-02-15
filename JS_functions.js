@@ -1,5 +1,5 @@
 function Load_Map() {
-// DEFINE VARIABLES
+    // map width and height
     let w = 3000;
     let h = 1250;
 
@@ -7,7 +7,6 @@ function Load_Map() {
     let minZoom;
     let maxZoom;
 
-    // DEFINE FUNCTIONS/OBJECTS
     // Define map projection
     let projection = d3
         .geoEquirectangular()
@@ -351,7 +350,7 @@ function Draw_Circles(projection, g, pathDataset) {
                     Create_Data_Histogram(circles_data[i][0], true); // update histogram data
 
                     $("#pieChart").empty();
-                    Draw_PieChart(circles_data[i][0], true);
+                    Draw_PieChart(circles_data[i][0], true); // update pieChart
                 })
                 .append("title") // tooltip with some information of infected inside a circle
                 .text(circles_data[i][0][0][3] + ", " + circles_data[i][0][0][4] + ", " + circles_data[i][0][0][5] +
@@ -529,7 +528,7 @@ function Draw_Histogram(histogram_data) {
 
     svg.append('g')
         .call(d3.axisLeft(yScale))
-        .attr("font-size",10);
+        .attr("font-size", 10);
 
     let myTool = d3.select("body")
         .append("div")
@@ -539,11 +538,17 @@ function Draw_Histogram(histogram_data) {
 
     let barColor_lowRisk = "#969696";
     let barColor_mediumRisk = "#525252";
+
     //create the svg for the grid
     svg.selectAll("rect")
         .data(real_histogram_data)
         .enter()
         .append("rect")
+        .attr("id", function (d) {
+                return d.age.replace(" ", "")
+                    .replace("<", "")
+                    .replace(">", "");
+        })
         .attr("fill", function (d) {
             if (d.age === "< 10" || d.age === "> 90") {
                 return barColor_lowRisk;
@@ -575,12 +580,16 @@ function Draw_Histogram(histogram_data) {
                 .style("opacity", "1")
                 .style("display", "block"); //The tooltip appears
             myTool.html(" <div id='thumbnail'>" +
-                "<img src='Images/men_icon.png' height='20' width='20' style = 'display:inline;margin-left: 8px'/><p style = 'display:inline;margin-right: 10px'>" + d.numMales + "</p>" +
-                "<img src='Images/woman_icon.png' height='20' width='20' style = 'display:inline;margin-top: 2px'/><p style = 'display:inline;margin-right: 10px'>" + d.numFemales + "</p>" +
+                    "<img src='Images/men_icon.png' height='20' width='20' style = 'display:inline;margin-left: 8px'/>" +
+                    "<p style = 'display:inline;margin-right: 10px'>" + d.numMales + "</p>" +
+                    "<img src='Images/woman_icon.png' height='20' width='20' style = 'display:inline;margin-top: 2px'/>" +
+                    "<p style = 'display:inline;margin-right: 10px'>" + d.numFemales + "</p>" +
                 "</div>" +
                 "<div id='thumbnail2'>" +
-                "<img src='Images/dead_icon.png' height='20' width='20' style = 'display:inline'/><p style = 'display:inline;margin-right: 21px;margin-bottom: 2px'>" + d.numDead + "</p>" +
-                "<img src='Images/alive_icon.png' height='20' width='20' style = 'display:inline;margin-right: 2px'/><p style = 'display:inline'>" + d.numAlive + "</p>" +
+                    "<img src='Images/dead_icon.png' height='20' width='20' style = 'display:inline'/>" +
+                    "<p style = 'display:inline;margin-right: 21px;margin-bottom: 2px'>" + d.numDead + "</p>" +
+                    "<img src='Images/alive_icon.png' height='20' width='20' style = 'display:inline;margin-right: 2px'/>" +
+                    "<p style = 'display:inline'>" + d.numAlive + "</p>" +
                 "</div>"
             )
             .style("left", (d3.event.pageX) + "px")
@@ -598,7 +607,7 @@ function Draw_Histogram(histogram_data) {
             else {
                 current_color = barColor_mediumRisk;
             }
-            d3.select(this).transition().style("fill",current_color);
+            d3.select(this).transition().style("fill", current_color);
             svg.selectAll("#id_line").remove();
             myTool.transition()  //Opacity transition when the tooltip disappears
                 .duration(500)
@@ -655,7 +664,7 @@ function Draw_Histogram(histogram_data) {
 
 function Draw_PieChart(circles_data, bOnClick) {
     let unified_infected_data = [], affected_chronic = [], tmp_diseases = [], diseases_array = [], pieChart_data = [];
-    let num_tot_people, perc_chronic, num_tot_diseases = 0, num_others = 0, w, h, r = 0;
+    let num_tot_people, perc_chronic, num_tot_diseases = 0, num_others = 0, sum_ages = 0, w, h, r = 0;
     let color;
 
     if (bOnClick) {
@@ -672,7 +681,7 @@ function Draw_PieChart(circles_data, bOnClick) {
 
     for (let x = 0; x < num_tot_people; x++) {
         if (unified_infected_data[x][8] > 0) {
-            affected_chronic.push([parseInt(unified_infected_data[x][8]), unified_infected_data[x][9]]);
+            affected_chronic.push([parseInt(unified_infected_data[x][8]), unified_infected_data[x][9], unified_infected_data[x][1]]);
         }
     }
 
@@ -680,6 +689,7 @@ function Draw_PieChart(circles_data, bOnClick) {
 
     for (let x = 0; x < affected_chronic.length; x++) {
         num_tot_diseases += affected_chronic[x][0];
+        sum_ages += parseInt(affected_chronic[x][2]);
         tmp_diseases = affected_chronic[x][1].split(", ");
 
         for (let y = 0; y < tmp_diseases.length; y++) {
@@ -767,7 +777,33 @@ function Draw_PieChart(circles_data, bOnClick) {
         .enter()                                //this will create <g> elements for every "extra" pieChart_data element that should be associated with
                                                 //a selection. The result is creating a <g> for every object in the pieChart_data array
         .append("g")                            //create a group to hold each slice (we will have a <path> and a <text>
-        .attr("class", "slice");    //allow us to style things in the slices (like text)
+        .attr("class", "slice")     //allow us to style things in the slices (like text)
+        .on("click", function () {
+            let bar_element;
+            let avg_ages = sum_ages / affected_chronic.length;
+
+            if (!isNaN(avg_ages)) {
+                if (avg_ages < 10) {
+                    bar_element = $("#10");
+                } else if (avg_ages >= 10 && avg_ages < 31) {
+                    bar_element = $("#10-30");
+                } else if (avg_ages >= 31 && avg_ages < 51) {
+                    bar_element = $("#31-50");
+                } else if (avg_ages >= 51 && avg_ages < 71) {
+                    bar_element = $("#51-70");
+                } else if (avg_ages >= 71 && avg_ages < 91) {
+                    bar_element = $("#71-90");
+                } else {
+                    bar_element = $("#90");
+                }
+
+                bar_element.attr("class", "blink_me");
+
+                setTimeout(function () {
+                    bar_element.removeClass("blink_me");
+                }, 3000);
+            }
+        });
 
     arcs.append("path")
         .attr("fill", function(d, i) {
