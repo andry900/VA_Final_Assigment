@@ -161,21 +161,19 @@ function Load_Map() {
                 .enter()
                 .append("path")
                 .attr("d", path)
-                .attr("id", function(d, i) {
+                .attr("id", function(d) {
                     return "country" + d.properties.iso_a3;
                 })
                 .attr("class", "country")
-                //      .attr("stroke-width", 10)
-                //      .attr("stroke", "#ff0000")
                 // add a mouseover action to show name label for feature/country
-                .on("mouseover", function(d, i) {
+                .on("mouseover", function(d) {
                     d3.select("#countryLabel" + d.properties.iso_a3).style("display", "block");
                 })
-                .on("mouseout", function(d, i) {
+                .on("mouseout", function(d) {
                     d3.select("#countryLabel" + d.properties.iso_a3).style("display", "none");
                 })
                 // add an onclick action to zoom into clicked country
-                .on("click", function(d, i) {
+                .on("click", function(d) {
                     d3.selectAll(".country").classed("country-on", false);
                     d3.select(this).classed("country-on", true);
                     boxZoom(path.bounds(d), path.centroid(d), 20);
@@ -197,14 +195,14 @@ function Load_Map() {
                     );
                 })
                 // add mouseover functionality to the label
-                .on("mouseover", function(d, i) {
+                .on("mouseover", function() {
                     d3.select(this).style("display", "block");
                 })
-                .on("mouseout", function(d, i) {
+                .on("mouseout", function() {
                     d3.select(this).style("display", "none");
                 })
                 // add an onlcick action to zoom into clicked country
-                .on("click", function(d, i) {
+                .on("click", function(d) {
                     d3.selectAll(".country").classed("country-on", false);
                     d3.select("#country" + d.properties.iso_a3).classed("country-on", true);
                     boxZoom(path.bounds(d), path.centroid(d), 20);
@@ -238,13 +236,13 @@ function Load_Map() {
         }
     );
 
-    setTimeout(function() {
+    setTimeout(function() { // to allow the full load of map data
         Prepare_Circles_Area(projection);
     }, 1000);
 }
 
 function Prepare_Circles_Area(projection) {
-    let g = d3.select("svg")
+    let g = d3.select("svg")    // create a g area for the circles with the same transform attribute of the map
         .append("g")
         .attr("id", "circles-area")
         .attr("transform", $("#map").attr("transform"));
@@ -257,28 +255,29 @@ function Draw_Circles(projection, g, pathDataset) {
     let circles_data = [];
     let previous_color = "", previous_circle = "";
 
-    d3.csv(pathDataset, function(csv_data) {
-        let table_data = new Array(csv_data.length).fill(Array(4));
+    d3.csv(pathDataset, function(csv_data) { // open World_Dataset csv
+        let table_data = new Array(csv_data.length).fill(Array(4)); // array that will contains data of all the people in the dataset
         let table;
 
-        for (let i = 0; i < csv_data.length; i++) {
-            if (table_data[csv_data[i].ID - 1][0] === undefined) {
-                let infected_data = [];
+        for (let i = 0; i < csv_data.length; i++) { // for every row of the csv
+            if (table_data[csv_data[i].ID - 1][0] === undefined) {  // if the person is not in a circle
+                let infected_data = [];     // initialize array that will contains data of the people inside a cycle
 
                 circle_ID++;
                 sumLatitudes = parseFloat(csv_data[i].latitude);
                 sumLongitudes = parseFloat(csv_data[i].longitude);
                 table_data[csv_data[i].ID - 1] = [csv_data[i].ID, csv_data[i].age, csv_data[i].sex, csv_data[i].city, csv_data[i].province,
                     csv_data[i].country, csv_data[i].latitude, csv_data[i].longitude, csv_data[i].number_chroDiseases, csv_data[i].chronic_diseases,
-                    csv_data[i].dead_alive];
+                    csv_data[i].dead_alive];    // add person information in the table_data array
 
                 infected_data[0] = table_data[csv_data[i].ID - 1];
 
                 let count = 1;
-                for (let j = 1; j < csv_data.length; j++) {
-                    if (table_data[csv_data[j].ID - 1][0] === undefined) {
+                for (let j = 1; j < csv_data.length; j++) { // cycle on all the people to verify if they are close to the one considered in the previous cycle
+                    if (table_data[csv_data[j].ID - 1][0] === undefined) {  // if the person is not in a circle
                         if (Math.sqrt(Math.pow(parseFloat(csv_data[i].latitude) - parseFloat(csv_data[j].latitude), 2) -
                             Math.pow(parseFloat(csv_data[i].longitude) - parseFloat(csv_data[j].longitude), 2)) <= 0.1) {
+                            // we apply the formula for the distance between 2 points with (x = latitude, y = longitude) and we check if it is less then 0.1
 
                             sumLatitudes += parseFloat(csv_data[j].latitude);
                             sumLongitudes += parseFloat(csv_data[j].longitude);
@@ -291,11 +290,12 @@ function Draw_Circles(projection, g, pathDataset) {
                         }
                     }
                 }
-
+                // circles_data will contains data of all the people inside it and the projection of the average of longitude and latitude
                 circles_data[circle_ID - 1] = [infected_data, projection([sumLongitudes/(infected_data.length), sumLatitudes/(infected_data.length)])];
             }
         }
 
+        // sort circles_data on infected_data length to make bigger circles drawn at the end, so they'll be more in evidence
         circles_data.sort(function(a, b) {
             return a[0].length - b[0].length;
         });
@@ -347,10 +347,10 @@ function Draw_Circles(projection, g, pathDataset) {
                     });
 
                     $("#histogram").empty();
-                    Create_Data_Histogram(circles_data[i][0], true); // update histogram data
+                    Create_Data_Histogram(circles_data[i][0], true); // update histogram data with selected circle data
 
                     $("#pieChart").empty();
-                    Draw_PieChart(circles_data[i][0], true); // update pieChart
+                    Draw_PieChart(circles_data[i][0], true);    // update pieChart with selected circle data
                 })
                 .append("title") // tooltip with some information of infected inside a circle
                 .text(circles_data[i][0][0][3] + ", " + circles_data[i][0][0][4] + ", " + circles_data[i][0][0][5] +
@@ -365,8 +365,8 @@ function Draw_Circles(projection, g, pathDataset) {
             "scrollX": true
         });
 
-        Create_Data_Histogram(circles_data, false);
-        Draw_PieChart(circles_data, false);
+        Create_Data_Histogram(circles_data, false);     // create histogram data with the whole dataset
+        Draw_PieChart(circles_data, false);     // update pieChart with the whole dataset
     });
 }
 
@@ -374,9 +374,9 @@ function Create_Data_Histogram(circles_data, bOnClick) {
     let unified_infected_data = [], ages_array = [], grouped_infected_data = [];
     let num_same_age = 0, num_males = 0, num_females = 0, num_dead = 0, num_alive = 0;
 
-    if (bOnClick) {
+    if (bOnClick) {     // the variable is true if the function is accessed through a circle click
         unified_infected_data = circles_data;
-    } else {
+    } else {    // the first histogram load with all the data
         for (let x = 0; x < circles_data.length; x++) {
             for (let y = 0; y < circles_data[x][0].length; y++) {
                 unified_infected_data.push(circles_data[x][0][y]);
@@ -384,12 +384,12 @@ function Create_Data_Histogram(circles_data, bOnClick) {
         }
     }
 
-    for (let x = 0; x < unified_infected_data.length; x++) {
-        if (!ages_array.includes(unified_infected_data[x][1])) {
-            ages_array.push(unified_infected_data[x][1]);
+    for (let x = 0; x < unified_infected_data.length; x++) {    // for every infected person
+        if (!ages_array.includes(unified_infected_data[x][1])) {    // check if his age has been already considered
+            ages_array.push(unified_infected_data[x][1]);   // add his age to the ages_array
             num_same_age = 1;
 
-            if (unified_infected_data[x][2] === "male") {
+            if (unified_infected_data[x][2] === "male") {   // check if he it is a male
                 num_males = 1;
                 num_females = 0;
             } else {
@@ -397,7 +397,7 @@ function Create_Data_Histogram(circles_data, bOnClick) {
                 num_males = 0;
             }
 
-            if (unified_infected_data[x][10] === "alive") {
+            if (unified_infected_data[x][10] === "alive") {     // check if he it is alive
                 num_alive = 1;
                 num_dead = 0;
             } else {
@@ -405,9 +405,9 @@ function Create_Data_Histogram(circles_data, bOnClick) {
                 num_alive = 0;
             }
 
-            for (let y = x + 1; y < unified_infected_data.length; y++) {
+            for (let y = x + 1; y < unified_infected_data.length; y++) {    // for all the following people
                 if (unified_infected_data[x][1] === unified_infected_data[y][1]) { // if 2 people have the same age
-                    num_same_age++;
+                    num_same_age++;     // add another person to the count for that age
 
                     if (unified_infected_data[y][2] === "male") {
                         num_males++;
@@ -426,13 +426,14 @@ function Create_Data_Histogram(circles_data, bOnClick) {
                     }
                 }
             }
+            // add to grouped_infected_data the age, the number of people with that age, number of males and females, number of dead and alive
             grouped_infected_data.push([parseInt(unified_infected_data[x][1]), num_same_age, num_males, num_females, num_dead, num_alive]);
         }
     }
 
     let histogram_data = [];
-    for (let i = 0; i < 6; i++) {
-        histogram_data[i] = Prepare_Histogram(grouped_infected_data, i);
+    for (let i = 0; i < 6; i++) {   // for all the 5 age categories
+        histogram_data[i] = Prepare_Histogram(grouped_infected_data, i);    // return data for the histogram for each category
     }
 
     Draw_Histogram(histogram_data);
@@ -464,8 +465,8 @@ function Prepare_Histogram(grouped_infected_data, i){
             break;
     }
 
-    for (let j = 0; j < grouped_infected_data.length; j++) {
-        if (eval(condition)) {
+    for (let j = 0; j < grouped_infected_data.length; j++) {    // for every person if grouped_infected_data
+        if (eval(condition)) {  // if his age is in the considered range
             num_cases += grouped_infected_data[j][1];
             num_males += grouped_infected_data[j][2];
             num_females += grouped_infected_data[j][3];
@@ -517,9 +518,9 @@ function Draw_Histogram(histogram_data) {
         .call(d3.axisBottom(xScale))
         .attr("font-size",10);
 
-    let max_quantity = Math.max(histogram_data[0][0],histogram_data[1][0],histogram_data[2][0],
-    histogram_data[3][0],histogram_data[4][0],histogram_data[5][0]);
-    let scale_quantity = Math.round(max_quantity + Math.ceil((max_quantity*10)/100));
+    let max_quantity = Math.max(histogram_data[0][0], histogram_data[1][0], histogram_data[2][0],
+    histogram_data[3][0], histogram_data[4][0],histogram_data[5][0]);   // get the max number of people in an age category
+    let scale_quantity = Math.round(max_quantity + Math.ceil((max_quantity * 10)/100)); // set the histogram max to the 10% of the maximum
 
     // Y axis: scale and draw:
     const yScale = d3.scaleLinear()
@@ -544,12 +545,12 @@ function Draw_Histogram(histogram_data) {
         .data(real_histogram_data)
         .enter()
         .append("rect")
-        .attr("id", function (d) {
+        .attr("id", function (d) {  // create an id for the bars identification
                 return d.age.replace(" ", "")
                     .replace("<", "")
                     .replace(">", "");
         })
-        .attr("fill", function (d) {
+        .attr("fill", function (d) {    // color the bars based on the age category (PCA)
             if (d.age === "< 10" || d.age === "> 90") {
                 return barColor_lowRisk;
             }
@@ -564,7 +565,7 @@ function Draw_Histogram(histogram_data) {
         .attr("height", function(d) {
             return height - yScale(d.quantity);
         })
-        .on("mouseover", function(d) {
+        .on("mouseover", function(d) {  // attributes for the creation af the histogram tooltips
             svg.append('line')
                 .attr("id","id_line")
                 .attr('x1', xScale)
@@ -664,6 +665,7 @@ function Draw_Histogram(histogram_data) {
             return formatCount(d.quantity);
         });
 
+    // create histogram legend
     Pca_Legend(svg);
 }
 
@@ -672,7 +674,7 @@ function Draw_PieChart(circles_data, bOnClick) {
     let num_tot_people, perc_chronic, num_tot_diseases = 0, num_others = 0, sum_ages = 0, count = 0, w, h, r = 0;
     let color;
 
-    if (bOnClick) {     // is true if the function is accessed by a circle click
+    if (bOnClick) {     // the variable is true if the function is accessed through a circle click
         unified_infected_data = circles_data;
     } else {    // the first pieChat load with all the data
         for(let x = 0; x < circles_data.length; x++) {
@@ -684,13 +686,14 @@ function Draw_PieChart(circles_data, bOnClick) {
 
     num_tot_people = unified_infected_data.length;
 
-    for (let x = 0; x < num_tot_people; x++) {
-        if (unified_infected_data[x][8] > 0) {  // create a new array with people having chronicle diseases
+    for (let x = 0; x < num_tot_people; x++) {  // for every person in unified_infected_data
+        if (unified_infected_data[x][8] > 0) {  // if he has a chronicle disease
+            // create a new array with people having chronicle diseases composed by a person number of diseases, names of the diseases and his age
             affected_chronic.push([parseInt(unified_infected_data[x][8]), unified_infected_data[x][9], unified_infected_data[x][1]]);
         }
     }
 
-    for (let x = 0; x < affected_chronic.length; x++) {
+    for (let x = 0; x < affected_chronic.length; x++) {     // for all the people with chronicle diseases
         num_tot_diseases += affected_chronic[x][0];
         tmp_diseases = affected_chronic[x][1].split(", ");  // split the diseases descriptions into an array
 
@@ -699,8 +702,8 @@ function Draw_PieChart(circles_data, bOnClick) {
                 diseases_array.push([tmp_diseases[y], 1, parseInt(affected_chronic[x][2])]);
             }
             else {
-                for(let i = 0; i < diseases_array.length; i++) {
-                    if(diseases_array[i][0] === tmp_diseases[y]) {
+                for(let i = 0; i < diseases_array.length; i++) {    // the diseases was already considered ad we add data to this record
+                    if (diseases_array[i][0] === tmp_diseases[y]) {     // check where was stored the disease in the diseases_array
                         diseases_array[i][1] += 1; // add a person to the count of a disease
                         diseases_array[i][2] += parseInt(affected_chronic[x][2]);   // add the age of a person
                         break;  // a person can have only 1 time the same disease...
@@ -714,10 +717,11 @@ function Draw_PieChart(circles_data, bOnClick) {
         return arr.some(row => row.includes(search));
     }
 
+    // percentage of people with chronicle diseases respect to the total number of people
     perc_chronic = ((affected_chronic.length/num_tot_people) * 100).toFixed(2);
 
     if (perc_chronic > 0) {
-        d3.select("#pieChart")
+        d3.select("#pieChart")  // create a text area with some information about chronic diseases
             .append("text")
             .append("b")
             .text("The percentage of people with chronic diseases out of " + num_tot_people + " is: " +
@@ -735,9 +739,9 @@ function Draw_PieChart(circles_data, bOnClick) {
     color = d3.scaleOrdinal(d3.schemeCategory20c);
 
     if (num_tot_diseases > 0) { // check if in a certain area at least 1 person has a chronicle disease
-        for (let x = 0; x < diseases_array.length; x++) {
+        for (let x = 0; x < diseases_array.length; x++) {   // for every disease
             if (diseases_array[x][1] / num_tot_diseases >= 0.09) {  // check if more then 9% of the people has the disease
-                pieChart_data.push({
+                pieChart_data.push({    // add data to the pieChart_data array
                     disease: diseases_array[x][0],  // disease name
                     percentage: ((diseases_array[x][1] / num_tot_diseases) * 100).toFixed(2),
                     avg_ages: diseases_array[x][2]/diseases_array[x][1] // average of ages of people with a certain disease
@@ -749,7 +753,7 @@ function Draw_PieChart(circles_data, bOnClick) {
             }
         }
 
-        if (num_others > 0) {       // the other slice is create with all the diseases with less then 9% of cases
+        if (num_others > 0) {   // the other slice is create with all the diseases with less then 9% of cases
             pieChart_data.push({
                 disease: "other",
                 percentage: (num_others * 100).toFixed(2),
@@ -765,32 +769,32 @@ function Draw_PieChart(circles_data, bOnClick) {
     }
 
     let vis = d3.select("#pieChart")
-        .append("svg")                  //create the SVG element
-        .data([pieChart_data])          //associate our pieChart_data with the document
-        .attr("width", w)         // set the width and height of our visualization
+        .append("svg")      //create the SVG element
+        .data([pieChart_data])
+        .attr("width", w)
         .attr("height", h)
-        .append("g")                    //make a group to hold our pie chart
+        .append("g")
         .attr("transform", "translate(" + w/2 + "," + h/3.8 + ")");
 
-    let arc = d3.arc()              //this will create <path> elements for us using arc pieChart_data
+    let arc = d3.arc()      //this will create <path> elements for us using arc pieChart_data
         .innerRadius(0)
         .outerRadius(r);
 
-    let pie = d3.pie()              //this will create arc pieChart_data for us given a list of values
+    let pie = d3.pie()      //this will create arc pieChart_data for us given a list of values
         .value(function(d) {
             return d.percentage;
-        });                         //we must tell it out to access the value of each element in our pieChart_data array
+        });
 
     let arcs = vis.selectAll("g.slice")
         .data(pie)
         .enter()
         .append("g")
         .attr("class", "slice")
-        .on("click", function (d) {
+        .on("click", function (d) {     // add onClick on every slice of the pie chart
             if (!isNaN(d["data"].avg_ages)) {   // verify if the average of ages is a number
                 let bar_element;
 
-                if (d["data"].avg_ages < 10) {
+                if (d["data"].avg_ages < 10) {  // check if the age average is less than 10
                     bar_element = $("#10");     // select the bar of babies with less then 10 years
                 } else if (d["data"].avg_ages >= 10 && d["data"].avg_ages < 31) {
                     bar_element = $("#10-30");
@@ -814,12 +818,12 @@ function Draw_PieChart(circles_data, bOnClick) {
 
     arcs.append("path")
         .attr("fill", function(d, i) {
-            return color(i);
-        })                                    //set the color for each slice to be chosen from the color function defined above
-        .attr("d", arc);                //this creates the actual SVG path using the associated pieChart_data (pie) with the arc drawing function
+            return color(i);    //set the color for each slice to be chosen from the color function defined above
+        })
+        .attr("d", arc);    //this creates the actual SVG path using the associated pieChart_data (pie) with the arc drawing function
 
-    arcs.append("text")                                     //add a label to each slice
-        .attr("transform", function(d) {       //set the label's origin to the center of the arc we have to make sure to set these before calling arc.centroid
+    arcs.append("text")     //add a label to each slice
+        .attr("transform", function(d) {
             d.innerRadius = 0;
             d.outerRadius = r;
 
@@ -827,12 +831,12 @@ function Draw_PieChart(circles_data, bOnClick) {
                 return "translate(" + arc.centroid(d) + ")";
             }
         })
-        .attr("text-anchor", "middle")              //center the text on it's origin
+        .attr("text-anchor", "middle")
         .text(function(d, i) {
-            return pieChart_data[i].disease;                    //get the disease from our original pieChart_data
+            return pieChart_data[i].disease;    //get the disease from our original pieChart_data
         });
 
-    if (num_tot_diseases > 0) {     // percentage labels
+    if (num_tot_diseases > 0) {     // add the percentage labels if there is at least 1 disease
         arcs.append("text")
             .attr("transform", function (d) {
                 let _d = arc.centroid(d);
@@ -848,6 +852,7 @@ function Draw_PieChart(circles_data, bOnClick) {
     }
 }
 
+// this function will create the histogram legend with 3 colors and their associated risk for an healthy person to catch the virus
 function Pca_Legend(svg){
     svg.append("circle").attr("cy",300).attr("cx",-12).attr("r", 10).style("fill", "#969696");
     svg.append("circle").attr("cy",300).attr("cx",80).attr("r", 10).style("fill", "#525252");
