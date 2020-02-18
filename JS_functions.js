@@ -540,7 +540,7 @@ function Draw_Histogram(histogram_data) {
     let barColor_lowRisk = "#969696";
     let barColor_mediumRisk = "#525252";
 
-    //create the svg for the grid
+    //create the histogram bars
     svg.selectAll("rect")
         .data(real_histogram_data)
         .enter()
@@ -641,8 +641,7 @@ function Draw_Histogram(histogram_data) {
         .attr("font-size",12)
         .text('Age group');
 
-    let formatCount = d3.format(",.0f");
-
+    // put the labels for the number of cases on the bars
     svg.selectAll(null)
         .data(real_histogram_data)
         .enter()
@@ -662,7 +661,7 @@ function Draw_Histogram(histogram_data) {
             return "translate(" + xScale(d.age) + "," + yScale(d.quantity) + ")";
         })
         .text(function(d) {
-            return formatCount(d.quantity);
+            return d.quantity;
         });
 
     // create histogram legend
@@ -687,13 +686,13 @@ function Draw_PieChart(circles_data, bOnClick) {
     num_tot_people = unified_infected_data.length;
 
     for (let x = 0; x < num_tot_people; x++) {  // for every person in unified_infected_data
-        if (unified_infected_data[x][8] > 0) {  // if he has a chronicle disease
-            // create a new array with people having chronicle diseases composed by a person number of diseases, names of the diseases and his age
+        if (unified_infected_data[x][8] > 0) {  // if he has a chronic disease
+            // create a new array with people having chronic diseases composed by a person number of diseases, names of the diseases and his age
             affected_chronic.push([parseInt(unified_infected_data[x][8]), unified_infected_data[x][9], unified_infected_data[x][1]]);
         }
     }
 
-    for (let x = 0; x < affected_chronic.length; x++) {     // for all the people with chronicle diseases
+    for (let x = 0; x < affected_chronic.length; x++) {     // for all the people with chronic diseases
         num_tot_diseases += affected_chronic[x][0];
         tmp_diseases = affected_chronic[x][1].split(", ");  // split the diseases descriptions into an array
 
@@ -717,7 +716,7 @@ function Draw_PieChart(circles_data, bOnClick) {
         return arr.some(row => row.includes(search));
     }
 
-    // percentage of people with chronicle diseases respect to the total number of people
+    // percentage of people with chronic diseases respect to the total number of people
     perc_chronic = ((affected_chronic.length/num_tot_people) * 100).toFixed(2);
 
     if (perc_chronic > 0) {
@@ -738,7 +737,7 @@ function Draw_PieChart(circles_data, bOnClick) {
     r = ($("#pieChart").width() * 0.7)/2;
     color = d3.scaleOrdinal(d3.schemeCategory20c);
 
-    if (num_tot_diseases > 0) { // check if in a certain area at least 1 person has a chronicle disease
+    if (num_tot_diseases > 0) { // check if in a certain area at least 1 person has a chronic disease
         for (let x = 0; x < diseases_array.length; x++) {   // for every disease
             if (diseases_array[x][1] / num_tot_diseases >= 0.09) {  // check if more then 9% of the people has the disease
                 pieChart_data.push({    // add data to the pieChart_data array
